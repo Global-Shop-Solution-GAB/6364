@@ -1,0 +1,765 @@
+﻿Program.Sub.ScreenSU.Start
+Gui.FormIssMat..Create(BaseForm)
+Gui.FormIssMat..Caption("SigmaNest Issue Material")
+Gui.FormIssMat..Size(15360,10695)
+Gui.FormIssMat..MinX(0)
+Gui.FormIssMat..MinY(0)
+Gui.FormIssMat..Position(0,0)
+Gui.FormIssMat..BackColor(-2147483633)
+Gui.FormIssMat..MousePointer(0)
+Gui.FormIssMat..Event(UnLoad,FormIssMat_UnLoad)
+Gui.FormIssMat..AlwaysOnTop(False)
+Gui.FormIssMat..FontName("Tahoma")
+Gui.FormIssMat..FontSize(8.25)
+Gui.FormIssMat..ControlBox(True)
+Gui.FormIssMat..MaxButton(True)
+Gui.FormIssMat..MinButton(True)
+Gui.FormIssMat..Moveable(True)
+Gui.FormIssMat..Sizeable(True)
+Gui.FormIssMat..ShowInTaskBar(True)
+Gui.FormIssMat..TitleBar(True)
+Gui.FormIssMat.txtProgram.Create(TextBox,"",True,3930,300,0,225,375,True,0,"Arial",8,-2147483643,1)
+Gui.FormIssMat.txtProgram.Event(GotFocus,txtProgram_GotFocus)
+Gui.FormIssMat.lblProgram.Create(Label,"Program Name",True,1050,210,0,225,105,True,0,"Arial",8,-2147483633,0,0)
+Gui.FormIssMat.lblProgram.BorderStyle(0)
+Gui.FormIssMat.cmdProgram.Create(Button)
+Gui.FormIssMat.cmdProgram.Size(450,375)
+Gui.FormIssMat.cmdProgram.Position(4275,345)
+Gui.FormIssMat.cmdProgram.Caption("^")
+Gui.FormIssMat.cmdProgram.Event(Click,cmdProgram_Click)
+Gui.FormIssMat.cmdProgram.Enabled(True)
+Gui.FormIssMat.cmdProgram.Visible(True)
+Gui.FormIssMat.cmdProgram.Zorder(0)
+Gui.FormIssMat.cmdProgram.FontName("Tahoma")
+Gui.FormIssMat.cmdProgram.FontSize(8.25)
+Gui.FormIssMat.GsGridControl1.Create(GsGridControl)
+Gui.FormIssMat.GsGridControl1.Size(14835,8760)
+Gui.FormIssMat.GsGridControl1.Position(210,810)
+Gui.FormIssMat.GsGridControl1.Anchor(15)
+Gui.FormIssMat.GsGridControl1.Event(RowCellClick,GsGridControl1_RowCellClick)
+Gui.FormIssMat.GsGridControl1.Enabled(True)
+Gui.FormIssMat.GsGridControl1.Visible(True)
+Gui.FormIssMat.GsGridControl1.Zorder(0)
+Gui.FormIssMat.cmdIssueMat.Create(Button)
+Gui.FormIssMat.cmdIssueMat.Size(2010,375)
+Gui.FormIssMat.cmdIssueMat.Position(240,9690)
+Gui.FormIssMat.cmdIssueMat.Anchor(6)
+Gui.FormIssMat.cmdIssueMat.Caption("Issue Material")
+Gui.FormIssMat.cmdIssueMat.Event(Click,cmdIssueMat_Click)
+Gui.FormIssMat.cmdIssueMat.Enabled(True)
+Gui.FormIssMat.cmdIssueMat.Visible(True)
+Gui.FormIssMat.cmdIssueMat.Zorder(0)
+Gui.FormIssMat.cmdIssueMat.FontName("Tahoma")
+Gui.FormIssMat.cmdIssueMat.FontSize(8.25)
+Gui.FormIssMat.cmdRefresh.Create(Button)
+Gui.FormIssMat.cmdRefresh.Size(615,375)
+Gui.FormIssMat.cmdRefresh.Position(4830,360)
+Gui.FormIssMat.cmdRefresh.Caption("REFRESH")
+Gui.FormIssMat.cmdRefresh.Event(Click,cmdRefresh_Click)
+Gui.FormIssMat.cmdRefresh.Enabled(True)
+Gui.FormIssMat.cmdRefresh.Visible(True)
+Gui.FormIssMat.cmdRefresh.Zorder(0)
+Gui.FormIssMat.cmdRefresh.FontName("Tahoma")
+Gui.FormIssMat.cmdRefresh.FontSize(8.25)
+Gui.FormIssMat.ddlSel.Create(DropDownList)
+Gui.FormIssMat.ddlSel.Size(3075,300)
+Gui.FormIssMat.ddlSel.Position(5595,375)
+Gui.FormIssMat.ddlSel.Event(Change,ddlSel_Change)
+Gui.FormIssMat.ddlSel.Enabled(True)
+Gui.FormIssMat.ddlSel.Visible(True)
+Gui.FormIssMat.ddlSel.Zorder(0)
+Gui.FormIssMat.ddlSel.FontName("Tahoma")
+Gui.FormIssMat.ddlSel.FontSize(8.25)
+Gui.FormIssMat.lblSelection.Create(Label,"Selection",True,660,210,0,5610,90,True,0,"Arial",8,-2147483633,0,0)
+Gui.FormIssMat.lblSelection.BorderStyle(0)
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+'ip for the server may need to use the ip and not the name  \\172.29.129.17
+'Provider=SQLOLEDB.1;Server=172.29.120.17\SIGMANEST2;Database=SNDBase21;Uid=SNUser;Pwd=BestNest1445;
+V.Global.sCon.Declare(String,"")
+Program.External.Include.Library("6000.lib")
+Program.External.Include.Library("900300.lib")
+'V.Global.sBomPath.Declare(String,"")
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+F.Intrinsic.Control.SetErrorHandler("Main_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+V.Local.sFiles.Declare(String,"")
+
+F.Intrinsic.Control.SelectCase(V.Caller.Hook)
+	F.Intrinsic.Control.Case(49710)
+		V.Passed.MainFormView-windowsUIButtonPanel-1.Set("Script 3|~|Script 2|~|Sigma Iss/Flex")
+		
+		F.Intrinsic.Control.End
+	
+	F.Intrinsic.Control.Case(15710)
+		V.Passed.000016.Set("Sigma Iss/Flex")
+			
+	F.Intrinsic.Control.CaseElse
+		'runs from menu and script 1 on New GUI. Hook 49760 and script 1 on Old Gui. 15760
+		F.Intrinsic.Control.CallSub(PreFolderCheck)
+		
+'		F.ODBC.Connection!conS.OpenConnection(V.Global.sCon)
+		
+'		f.Data.Datatable.CreateFromSQL("STShtArc","conS","Select * From STShtArc",True)
+'				
+'		f.Data.Datatable.CreateFromSQL("STPIPArc","conS","Select * From PIP",True)
+'		
+'		f.Data.Datatable.CreateFromSQL("STPRGArc","conS","Select * From STPRGArc",True)
+'		
+'		f.Data.Datatable.CreateFromSQL("Program","conS","Select * From Program",True)
+'		
+'		f.Data.DataTable.CreateFromSQL("ProgramIssue","conS","Select Distinct * From STPrgARC Where TransType = 'SN102' and CompDate is null Order by ProgramName")
+'		
+'		f.Data.Datatable.CreateFromSQL("PIP","conS","select  a.WONUMBER, a.programname, a.RepeatID, b.TransType from STPIPArc a inner join STPRGArc b on a.programname = b.programname and a.RepeatID = b.RepeatID Order by ProgramName,TransType",True)
+		
+'		f.Data.Datatable.CreateFromSQL("WO","conS","select  WONumber from WO",True)
+'		
+'		F.ODBC.Connection!conS.Close
+'		
+'		F.Intrinsic.Control.If(V.Caller.User.UCase,=,"SUPERVSR")
+'			Function.Intrinsic.Debug.InvokeDebugger
+'			Function.Intrinsic.Debug.Stop
+'			
+'		F.Intrinsic.Control.EndIf
+		
+		F.Intrinsic.Control.BlockEvents
+		Gui.FormIssMat.ddlSel.AddItem("Issue Material",0)
+		Gui.FormIssMat.ddlSel.AddItem("Create Flex Schedule",1)
+		Gui.FormIssMat.ddlSel.Text("Issue Material")
+		F.Intrinsic.Control.UnBlockEvents
+		
+		Gui.FormIssMat..Show
+		Gui.FormIssMat..AlwaysOnTop(True)
+		Gui.FormIssMat..AlwaysOnTop(False)
+	
+F.Intrinsic.Control.EndSelect
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Main_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_Sigmnest_Issue_Mat.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FormIssMat_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.Main.End
+
+Program.Sub.FormIssMat_UnLoad.Start
+F.Intrinsic.Control.SetErrorHandler("FormIssMat_UnLoad_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+
+F.Intrinsic.Control.End
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("FormIssMat_UnLoad_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.Control.End
+Function.Intrinsic.Control.EndIf
+Program.Sub.FormIssMat_UnLoad.End
+
+Program.Sub.cmdProgram_Click.Start
+F.Intrinsic.Control.SetErrorHandler("cmdProgram_Click_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+V.Local.sSql.Declare(String,"")
+V.Local.sTitles.Declare(String,"")
+V.Local.sWidths.Declare(String,"")
+V.Local.sRet.Declare(String,"")
+
+
+F.ODBC.Connection!con.OpenCompanyConnection
+F.Intrinsic.Control.If(V.DataTable.ISS_Flex.Exists)
+	F.Data.DataTable.Close("ISS_Flex")
+F.Intrinsic.Control.EndIf
+F.Data.DataTable.CreateFromSQL("ISS_Flex","con","Select rtrim(ProgramName) as ProgramName, Issue_Mat, Flex_Sched From GCG_6364_Program_ISS",True)
+F.ODBC.Connection!con.Close
+
+F.ODBC.Connection!conS.OpenConnection(V.Global.sCon)
+
+F.Intrinsic.UI.SetBrowserHotTypeAhead(True)
+
+F.Intrinsic.Control.If(V.Screen.FormIssMat!ddlSel.Text,=,"Issue Material")
+	V.Local.sSql.Set("Select Distinct rtrim(ProgramName) as ProgramName From STPrgARC Where TransType = 'SN102' Order by ProgramName")
+'	V.Local.sSql.Set("Select Distinct rtrim(Program.ProgramName) as ProgramName From Program Join STPrgARC on Program.ProgramName = STPrgARC.ProgramName Where TransType = 'SN102'")
+	F.Data.DataTable.CreateFromSQL("Prog","conS",V.Local.sSql,True)
+	F.Data.DataTable.AddColumn("Prog","Iss_Mat",Boolean)
+	F.Data.Dictionary.CreateFromDataTable("ISS","ISS_Flex","ProgramName","Issue_Mat")
+	F.Data.DataTable.Close("ISS_Flex")
+	F.Data.Dictionary.SetDefaultReturn("ISS",False)
+	f.Data.DataTable.FillFromDictionary("Prog","ISS","ProgramName","Iss_Mat")
+	F.Data.Dictionary.Close("ISS")
+	F.Data.DataView.Create("Prog","Temp",22,"Iss_Mat = False","")
+	F.Data.DataView.ToString("Prog","Temp","ProgramName","*!*","~~~!!!",V.Local.sRet)
+	F.Data.DataView.Close("Prog","Temp")
+	F.Data.DataTable.Close("Prog")
+F.Intrinsic.Control.Else
+	V.Local.sSql.Set("Select Distinct rtrim(ProgramName) as ProgramName From PIP Order by ProgramName") 
+	F.Data.DataTable.CreateFromSQL("Prog","conS",V.Local.sSql,True)
+	F.Data.DataTable.AddColumn("Prog","Flex",String)
+	F.Data.Dictionary.CreateFromDataTable("Flex","ISS_Flex","ProgramName","Flex_Sched")
+	F.Data.DataTable.Close("ISS_Flex")
+	F.Data.Dictionary.SetDefaultReturn("Flex","N")
+	f.Data.DataTable.FillFromDictionary("Prog","Flex","ProgramName","Flex")
+	F.Data.Dictionary.Close("Flex")
+	F.Data.DataView.Create("Prog","Temp",22,"Flex = 'N'","")
+	F.Data.DataView.ToString("Prog","Temp","ProgramName","*!*","~~~!!!",V.Local.sRet)
+	F.Data.DataView.Close("Prog","Temp")
+	F.Data.DataTable.Close("Prog")
+F.Intrinsic.Control.EndIf
+
+V.Local.sTitles.Set("Program Name")
+V.Local.sWidths.Set("1800")
+
+F.Intrinsic.String.Split(V.Local.sTitles,"*!*",V.Local.sTitles)
+F.Intrinsic.String.Split(V.Local.sWidths,"*!*",V.Local.sWidths)
+
+'F.Intrinsic.UI.Browser("Select Program Name","conS",V.Local.sSql,V.Local.sTitles,V.Local.sWidths,10200,9000,V.Local.sRet)
+
+F.ODBC.Connection!conS.Close
+
+F.Intrinsic.Control.If(V.Local.sRet.Trim,<>,"")
+	F.Intrinsic.UI.BrowserFromString("Select Program Name",V.Local.sRet,"*!*","~~~!!!",V.Local.sTitles,V.Local.sWidths,V.Local.sRet)
+
+	F.Intrinsic.Control.If(V.Local.sRet,<>,V.Ambient.Cancel)
+		Gui.FormIssMat.txtProgram.Text(V.Local.sRet.Trim)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.Else
+	F.Intrinsic.UI.Msgbox("No Available Program Names...","Attention")
+f.Intrinsic.Control.EndIf
+
+Gui.FormIssMat..SetFocus
+Gui.FormIssMat..AlwaysOnTop(True)
+Gui.FormIssMat..AlwaysOnTop(False)
+		
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("cmdProgram_Click_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_Sigmnest_Issue_Mat.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FormIssMat_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.cmdProgram_Click.End
+
+Program.Sub.txtProgram_GotFocus.Start
+F.Intrinsic.Control.SetErrorHandler("txtProgram_GotFocus_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+
+Gui.FormIssMat.txtProgram.SelectAll
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("txtProgram_GotFocus_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_Sigmnest_Issue_Mat.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FormIssMat_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.txtProgram_GotFocus.End
+
+Program.Sub.cmdRefresh_Click.Start
+F.Intrinsic.Control.SetErrorHandler("cmdRefresh_Click_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+V.Local.i.Declare(Long,0)
+V.Local.sJob.Declare(String,"")
+V.Local.sSuffix.Declare(String,"")
+V.Local.sSeq.Declare(String,"")
+V.Local.sSql.Declare(String,"")
+V.Local.sRet.Declare(String,"")
+V.Local.fQty.Declare(Float,0)
+
+F.Intrinsic.Control.If(V.DataTable.NestsIssue.Exists)
+	F.Data.DataTable.Close("NestsIssue")
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.If(V.DataTable.NestsFlex.Exists)
+	F.Data.DataTable.Close("NestsFlex")
+F.Intrinsic.Control.EndIf
+
+'a.nestedarea*a.QTYINPROCESS as nestedarea
+F.Intrinsic.Control.If(V.Screen.FormIssMat!ddlSel.Text,=,"Issue Material")
+	F.Intrinsic.String.Build("select Distinct a.WONUMBER, a.programname, a.QTYINPROCESS, rtrim(c.PrimeCode) as GSSPart, 'Description' as Description, c.BinNumber as Bin, c.HeatNumber as Heat, CAST(0 AS Float) as Inv_Qty, a.nestedarea, a.nestedarea*a.QTYINPROCESS as Total_nestedarea from STPIPArc a inner join STPRGArc b on a.programname = b.programname and a.RepeatID = b.RepeatID inner join STShtArc c on a.programname = c.programname and a.RepeatID = c.RepeatID Where a.programname = '{0}' and a.TransType = 'SN102'",V.Screen.FormIssMat!txtProgram.Text,V.Local.sSql)
+	F.ODBC.Connection!conS.OpenConnection(V.Global.sCon)
+	f.Data.Datatable.CreateFromSQL("NestsIssue","conS",V.Local.sSql,True)
+	
+	F.ODBC.Connection!conS.Close
+	
+	F.Data.DataTable.AddColumn("NestsIssue","Seq",String)
+	
+	F.ODBC.Connection!ConG.OpenCompanyConnection
+	
+	F.Data.Dictionary.CreateFromSQL("Bin","ConG","Select rtrim(Part), rtrim(Bin) From V_Inventory_Mstr")
+	F.Data.Dictionary.SetDefaultReturn("Bin","")
+	F.Data.DataTable.FillFromDictionary("NestsIssue","Bin","GSSPart","Bin")
+	F.Data.Dictionary.Close("Bin")
+	
+	F.Data.Dictionary.CreateFromSQL("Desc","ConG","Select rtrim(Part), rtrim(Description) From V_Inventory_Mstr")
+	F.Data.Dictionary.SetDefaultReturn("Desc","")
+	F.Data.DataTable.FillFromDictionary("NestsIssue","Desc","GSSPart","Description")
+	F.Data.Dictionary.Close("Desc")
+	
+	F.Intrinsic.Control.For(V.Local.i,0,V.DataTable.NestsIssue.RowCount--,1)
+		V.Local.sRet.Redim(0,0)
+		F.Intrinsic.String.Split(V.DataTable.NestsIssue(V.Local.i).WONUMBER!FieldValTrim,"-",V.Local.sJob)
+		V.Local.sJob.RedimPreserve(0,2)
+		V.Local.sSuffix.Set(V.Local.sJob(1))
+		V.Local.sSeq.Set(V.Local.sJob(2))
+		F.Intrinsic.String.Build("select Quantity from V_Item_Master where Part = '{0}' and Bin = '{1}' and Heat = '{2}'",V.DataTable.NestsIssue(V.Local.i).GSSPart!FieldValTrim,V.DataTable.NestsIssue(V.Local.i).Bin!FieldValTrim,V.DataTable.NestsIssue(V.Local.i).Heat!FieldValTrim,V.Local.sSql)
+		F.ODBC.Connection!ConG.ExecuteAndReturn(V.Local.sSql,V.Local.fQty)
+		F.Data.DataTable.SetValue("NestsIssue",V.Local.i,"Inv_Qty",V.Local.fQty)
+		F.Intrinsic.String.Build("Select Seq From V_Job_Operations Where Job = '{0}' and Suffix = '{1}' and Seq < '{2}' and LMO = 'M' and Part = '{3}'",V.Local.sJob,V.Local.sSuffix,V.Local.sSeq,V.DataTable.NestsIssue(V.Local.i).GSSPart!FieldValTrim,V.Local.sSql)
+		F.ODBC.Connection!ConG.ExecuteAndReturn(V.Local.sSql,V.Local.sRet)
+		F.Intrinsic.Control.If(V.Local.sRet.Trim,=,"")
+			F.Intrinsic.String.Build("Select Seq From V_Job_Operations Where Job = '{0}' and Suffix = '{1}' and Seq < '{2}' and LMO = 'M' and UM = 'SI'",V.Local.sJob,V.Local.sSuffix,V.Local.sSeq,V.Local.sSql)
+			F.ODBC.Connection!ConG.ExecuteAndReturn(V.Local.sSql,V.Local.sRet)
+			F.Intrinsic.String.Split(V.Local.sRet,"#$#",V.Local.sRet)
+			F.Intrinsic.Control.If(V.Local.sRet.UBound,=,0,"AND",V.Local.sRet.Trim,<>,"")
+				F.Data.DataTable.SetValue("NestsIssue",V.Local.i,"Seq",V.Local.sRet.Trim)	
+			F.Intrinsic.Control.EndIf
+		F.Intrinsic.Control.Else
+			F.Intrinsic.String.Split(V.Local.sRet,"#$#",V.Local.sRet)
+			F.Intrinsic.Control.If(V.Local.sRet.UBound,=,0)
+				F.Data.DataTable.SetValue("NestsIssue",V.Local.i,"Seq",V.Local.sRet.Trim)
+			F.Intrinsic.Control.EndIf
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.Next(V.Local.i)
+	
+	F.ODBC.Connection!ConG.Close
+
+	F.Intrinsic.Control.CallSub(Set_Prop,"GRID","GNest","DT","NestsIssue")
+F.Intrinsic.Control.Else
+	F.Intrinsic.String.Build("select Distinct WONUMBER, programname from STPIPArc Where programname = '{0}'",V.Screen.FormIssMat!txtProgram.Text,V.Local.sSql)
+	F.ODBC.Connection!conS.OpenConnection(V.Global.sCon)
+	f.Data.Datatable.CreateFromSQL("NestsFlex","conS",V.Local.sSql,True)
+	F.ODBC.Connection!conS.Close
+	F.Data.DataTable.AddColumn("NestsFlex","Job",String)
+	F.Data.DataTable.AddColumn("NestsFlex","Suffix",String)
+	F.Data.DataTable.AddColumn("NestsFlex","Labor Seq",String)
+	F.Data.DataTable.AddColumn("NestsFlex","Material Seq",String)
+	
+	F.ODBC.Connection!ConG.OpenCompanyConnection
+	
+	F.Intrinsic.Control.For(V.Local.i,0,V.DataTable.NestsFlex.RowCount--,1)
+		V.Local.sRet.Redim(0,0)
+		F.Intrinsic.String.Split(V.DataTable.NestsFlex(V.Local.i).WONUMBER!FieldValTrim,"-",V.Local.sJob)
+		V.Local.sJob.RedimPreserve(0,2)
+		V.Local.sSuffix.Set(V.Local.sJob(1))
+		V.Local.sSeq.Set(V.Local.sJob(2))
+		
+		F.Intrinsic.String.Build("Select Top 1 Seq From V_Job_Operations Where Job = '{0}' and Suffix = '{1}' and Seq < '{2}' and LMO = 'M' Order by Seq Desc",V.Local.sJob,V.Local.sSuffix,V.Local.sSeq,V.Local.sSql)
+		F.ODBC.Connection!ConG.ExecuteAndReturn(V.Local.sSql,V.Local.sRet)
+		
+		F.Intrinsic.Control.If(V.Local.sRet.Trim,<>,"")
+			F.Data.DataTable.SetValue("NestsFlex",V.Local.i,"Job",V.Local.sJob,"Suffix",V.Local.sSuffix,"Labor Seq",V.Local.sSeq,"Material Seq",V.Local.sRet)
+		F.Intrinsic.Control.Else
+			F.Data.DataTable.SetValue("NestsFlex",V.Local.i,"Job",V.Local.sJob,"Suffix",V.Local.sSuffix,"Labor Seq",V.Local.sSeq,"Material Seq","995000")
+		F.Intrinsic.Control.EndIf
+		
+	F.Intrinsic.Control.Next(V.Local.i)
+	
+	F.ODBC.Connection!ConG.Close
+	
+	F.Intrinsic.Control.CallSub(Set_Prop,"GRID","GFlex","DT","NestsFlex")
+F.Intrinsic.Control.EndIf
+
+Gui.FormIssMat..SetFocus
+Gui.FormIssMat..AlwaysOnTop(True)
+Gui.FormIssMat..AlwaysOnTop(False)
+		
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("cmdRefresh_Click_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_Sigmnest_Issue_Mat.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FormIssMat_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.cmdRefresh_Click.End
+
+Program.Sub.GsGridControl1_RowCellClick.Start
+F.Intrinsic.Control.SetErrorHandler("GsGridControl1_RowCellClick_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+V.Local.sJob.Declare(String,"")
+V.Local.sSuffix.Declare(String,"")
+V.Local.sSeq.Declare(String,"")
+V.Local.sSql.Declare(String,"")
+V.Local.sRet.Declare(String,"")
+
+F.Intrinsic.Control.If(V.Args.Column.UCase,=,"SEQ")
+	F.Intrinsic.String.Split(V.DataTable.NestsIssue(V.Args.RowIndex).WONUMBER!FieldValTrim,"-",V.Local.sJob)
+	V.Local.sJob.RedimPreserve(0,2)
+	V.Local.sSuffix.Set(V.Local.sJob(1))
+	V.Local.sSeq.Set(V.Local.sJob(2))
+'	F.Intrinsic.String.Build("Select Seq, Part, Description From V_Job_Operations Where Job = '{0}' and Suffix = '{1}' and Seq < '{2}' and LMO = 'M' and UM = 'SI'",V.Local.sJob,V.Local.sSuffix,V.Local.sSeq,V.Local.sSql)
+	F.Intrinsic.String.Build("Select Seq, Part, Description From V_Job_Operations Where (Job = '{0}' and Suffix = '{1}' and Seq < '{2}' and UM = 'SI' and LMO = 'M') or (Job = '{0}' and Suffix = '{1}' and Seq = '995000')",V.Local.sJob,V.Local.sSuffix,V.Local.sSeq,V.Local.sSql)
+	
+	F.Intrinsic.UI.SetBrowserHotTypeAhead(True)
+	F.ODBC.Connection!ConG.OpenCompanyConnection
+	
+	F.Intrinsic.UI.Browser("Material Seq","ConG",V.Local.sSQL,"Seq*!*SheetName*!*Description","30*!*30*!*70",V.Local.sRet)
+	
+	F.ODBC.Connection!ConG.Close
+	
+	F.Intrinsic.Control.If(V.Local.sRet,<>,"***CANCEL***")
+		F.Intrinsic.String.Split(V.Local.sRet,"*!*",V.Local.sRet)
+		
+		F.Data.DataTable.SetValue("NestsIssue",V.Args.RowIndex,"Seq",V.Local.sRet.Trim)
+		
+	F.Intrinsic.Control.EndIf
+	
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("GsGridControl1_RowCellClick_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_Sigmnest_Issue_Mat.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FormIssMat_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.GsGridControl1_RowCellClick.End
+
+Program.Sub.Set_Prop.Start
+F.Intrinsic.Control.SetErrorHandler("Set_Prop_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+
+Gui.FormIssMat.GsGridControl1.AddGridviewFromDatatable(V.Args.GRID,V.Args.DT)
+
+Gui.FormIssMat.GsGridControl1.SetGridviewProperty(V.Args.GRID,"ReadOnly",True)
+Gui.FormIssMat.GsGridControl1.SetGridviewProperty(V.Args.GRID,"Editable",False)
+
+Gui.FormIssMat.GsGridControl1.MainView(V.Args.GRID)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Set_Prop_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_Sigmnest_Issue_Mat.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FormIssMat_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.Set_Prop.End
+
+Program.Sub.ddlSel_Change.Start
+F.Intrinsic.Control.SetErrorHandler("ddlSel_Change_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+V.Local.sCap.Declare(String,"")
+
+Gui.FormIssMat.txtProgram.Text("")
+
+F.Intrinsic.Control.If(V.DataTable.NestsIssue.Exists)
+	F.Data.DataTable.Close("NestsIssue")
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.If(V.DataTable.NestsFlex.Exists)
+	F.Data.DataTable.Close("NestsFlex")
+F.Intrinsic.Control.EndIf
+
+Gui.FormIssMat.cmdIssueMat.Caption(V.Screen.FormIssMat!ddlSel.Text)
+
+F.Intrinsic.String.Build("SigmaNest {0}",V.Screen.FormIssMat!ddlSel.Text,V.Local.sCap)
+Gui.FormIssMat..Caption(V.Local.sCap)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("ddlSel_Change_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_Sigmnest_Issue_Mat.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FormIssMat_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.ddlSel_Change.End
+
+Program.Sub.cmdIssueMat_Click.Start
+F.Intrinsic.Control.SetErrorHandler("cmdIssueMat_Click_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+
+F.Intrinsic.Control.If(V.Screen.FormIssMat!ddlSel.Text,=,"Issue Material")
+	F.Intrinsic.Control.CallSub(Issue_Material)
+F.Intrinsic.Control.Else
+	F.Intrinsic.Control.CallSub(Create_FlexSchedule)
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.BlockEvents
+	Gui.FormIssMat.txtProgram.Text("")
+F.Intrinsic.Control.UnBlockEvents
+
+Gui.FormIssMat..SetFocus
+Gui.FormIssMat..AlwaysOnTop(True)
+Gui.FormIssMat..AlwaysOnTop(False)
+		
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("cmdIssueMat_Click_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_Sigmnest_Issue_Mat.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FormIssMat_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.cmdIssueMat_Click.End
+
+Program.Sub.Issue_Material.Start
+F.Intrinsic.Control.SetErrorHandler("Issue_Material_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+V.Local.i.Declare(Long,0)
+V.Local.sJob.Declare(String,"")
+V.Local.sSuffix.Declare(String,"")
+V.Local.sPart.Declare(String,"")
+V.Local.sRev.Declare(String,"")
+v.Local.sMOPEN.Declare(String,"")
+v.Local.sRet.Declare(String,"")
+V.Local.sSql.Declare(String,"")
+V.Local.iCountm.Declare(Long,0)
+V.Local.sQtyIssue.Declare(String,"")
+
+Gui.FormIssMat..Enabled(False)
+
+F.Intrinsic.Control.If(V.DataTable.IssueMaterial.Exists,=,False)
+	'Create our Issue Material DT
+	f.Data.DataTable.Create("IssueMaterial",True)
+	f.Data.DataTable.AddColumn("IssueMaterial","Part","String")
+	f.Data.DataTable.AddColumn("IssueMaterial","Rev","String")
+	f.Data.DataTable.AddColumn("IssueMaterial","Loc","String")
+	f.Data.DataTable.AddColumn("IssueMaterial","Qty","String")
+	f.Data.DataTable.AddColumn("IssueMaterial","Lot","String")
+	f.Data.DataTable.AddColumn("IssueMaterial","Bin","String")
+	f.Data.DataTable.AddColumn("IssueMaterial","Heat","String")
+	f.Data.DataTable.AddColumn("IssueMaterial","Serial","String")
+	f.Data.DataTable.AddColumn("IssueMaterial","Job","String")
+	f.Data.DataTable.AddColumn("IssueMaterial","Suffix","String")
+	f.Data.DataTable.AddColumn("IssueMaterial","Seq","String")
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.If(V.DataTable.NestsIssue.Exists)
+	F.Intrinsic.Control.If(V.DataTable.NestsIssue.RowCount--,=,-1)
+		F.Intrinsic.Control.ExitSub
+	F.Intrinsic.Control.EndIf
+	
+	F.Data.DataView.Create("NestsIssue","Temp",22,"Seq = '' or Seq is null","")
+	
+	F.Intrinsic.Control.If(V.DataView.NestsIssue!Temp.RowCount--,<>,-1)
+		F.Intrinsic.UI.Msgbox("Seq must be filled in for all lines before Issuing Material......","Attention")
+		F.Data.DataView.Close("NestsIssue","Temp")
+		F.Intrinsic.Control.ExitSub
+	F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.For(V.Local.i,0,V.DataTable.NestsIssue.RowCount--,1)
+		F.Intrinsic.String.Split(V.DataTable.NestsIssue(V.Local.i).WONUMBER!FieldValTrim,"-",V.Local.sJob)
+		V.Local.sJob.RedimPreserve(0,2)
+		V.Local.sSuffix.Set(V.Local.sJob(1))
+		F.Intrinsic.String.RPad(v.DataTable.NestsIssue(V.Local.i).GSSPart!FieldValTrim," ",20,V.Local.sPart)
+		F.Intrinsic.String.Right(V.Local.sPart,3,V.Local.sRev)
+		F.Intrinsic.String.Left(V.Local.sPart,17,V.Local.sPart)
+		F.Intrinsic.String.Format(v.DataTable.NestsIssue(V.Local.i).Total_nestedarea!FieldValFloat,"0.0000",V.Local.sQtyIssue)
+		f.Data.DataTable.AddRow("IssueMaterial","Part",V.Local.sPart.Trim,"Rev",V.Local.sRev.Trim,"Qty",V.Local.sQtyIssue,"Bin",v.DataTable.NestsIssue(V.Local.i).Bin!FieldValTrim,"Heat",v.DataTable.NestsIssue(V.Local.i).Heat!FieldValTrim,"Job",V.Local.sJob,"Suffix",V.Local.sSuffix,"Seq",v.DataTable.NestsIssue(V.Local.i).Seq!FieldValTrim)
+	F.Intrinsic.Control.Next(V.Local.i)
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.If(V.DataTable.IssueMaterial.RowCount--,<>,-1)
+	'Create a DataView just because we have to
+	f.Data.DataView.Create("IssueMaterial","IssueView",22,"","")
+	'IssueMaterial DT now has all of our Data to issue.
+	f.Intrinsic.String.Build("{0}\L{1}{2}MOPEN.txt",v.Caller.FilesDir,v.Caller.CompanyCode,v.Caller.Terminal,v.Local.sMOPEN)
+	f.Data.DataView.ToString("IssueMaterial","IssueView",",",v.Ambient.NewLine,v.Local.sRet)
+	F.Data.DataView.Close("IssueMaterial","IssueView")
+	f.Intrinsic.File.String2File(v.Local.sMOPEN,v.Local.sRet)
+	
+	'Now we can Issue the lines.
+	f.Intrinsic.String.Build("L{0}{1}MOPEN.txt",v.Caller.CompanyCode,v.Caller.Terminal,v.Local.sMOPEN)
+	
+	f.Global.General.CallWrapperSync(450100,v.Local.sMOPEN)
+	
+	F.ODBC.Connection!Conx.OpenCompanyConnection
+	'now that issued the material we need to go back and close all of the lines.
+	f.Intrinsic.Control.For(v.Local.iCountm,0,v.DataTable.IssueMaterial.RowCount--,1)
+		'we need to close each job suffix seq in this table.
+		f.Intrinsic.String.Build("UPDATE JOB_OPERATIONS SET FLAG_CLOSED = 'Y' WHERE JOB = '{0}' AND SUFFIX = '{1}' AND SEQ = '{2}' ",V.DataTable.IssueMaterial(V.Local.iCountm).Job!FieldValTrim,V.DataTable.IssueMaterial(V.Local.iCountm).Suffix!FieldValTrim,V.DataTable.IssueMaterial(V.Local.iCountm).Seq!FieldValTrim,v.Local.sSQL)
+		f.ODBC.Connection!Conx.Execute(v.Local.sSQL)
+	f.Intrinsic.Control.Next(v.Local.iCountm)
+	F.Intrinsic.String.Build("Select * From GCG_6364_Program_ISS Where ProgramName = '{0}'",V.Screen.FormIssMat!txtProgram.Text,V.Local.sSql)
+	F.Data.DataTable.CreateFromSQL("PN","conx",V.Local.sSql,True)
+	F.Intrinsic.Control.If(V.DataTable.PN.RowCount--,=,-1)
+		F.Data.DataTable.AddRow("PN","ProgramName",V.Screen.FormIssMat!txtProgram.Text,"Issue_Mat",True)
+	F.Intrinsic.Control.Else
+		F.Data.DataTable.SetValue("PN",-1,"Issue_Mat",True)
+	F.Intrinsic.Control.EndIf
+	F.Data.DataTable.SaveToDB("PN","conx","GCG_6364_Program_ISS","ProgramName",256,"ProgramName@!@ProgramName*!*Issue_Mat@!@Issue_Mat")
+	F.Data.DataTable.Close("PN")
+	F.ODBC.Connection!Conx.Close
+F.Intrinsic.Control.EndIf
+
+F.Data.DataTable.DeleteRow("IssueMaterial")
+F.Data.DataTable.AcceptChanges("IssueMaterial")
+
+F.Data.DataTable.DeleteRow("NestsIssue")
+F.Data.DataTable.AcceptChanges("NestsIssue")
+
+Gui.FormIssMat..Enabled(True)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Issue_Material_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_Sigmnest_Issue_Mat.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FormIssMat_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.Issue_Material.End
+
+Program.Sub.Create_FlexSchedule.Start
+F.Intrinsic.Control.SetErrorHandler("Create_FlexSchedule_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+V.Local.sFilter.Declare(String,"")
+V.Local.i.Declare(Long,0)
+V.Local.sScheduleNumber.Declare(String,"")
+V.Local.sSql.Declare(String,"")
+v.Local.fSched.Declare(Float,0)
+V.Local.sDate.Declare(String,"")
+V.Local.iIncrement.Declare(Long,0)
+V.Local.sIncrement.Declare(String,"")
+V.Local.sPart.Declare(String,"")
+V.Local.sWC.Declare(String,"")
+
+Gui.FormIssMat..Enabled(False)
+
+'formatting current date.
+F.Intrinsic.String.Format(V.Ambient.Date,"MMDDYY",V.Local.sDate)
+
+F.Data.DataView.Create("NestsFlex","Temp",22,"[Material Seq] = '' or [Material Seq] is Null","")
+
+F.Intrinsic.Control.If(V.DataView.NestsFlex!Temp.RowCount--,<>,-1)
+	F.Intrinsic.UI.Msgbox("Current Program does not have required field to create Flex Schedule","Attention")
+	F.Intrinsic.Control.ExitSub
+F.Intrinsic.Control.EndIf
+
+F.ODBC.Connection!con.OpenCompanyConnection
+
+V.Local.sSQL.Set("Select Last_PO_Num From Last_PO Where Ass_Sys = 'SCH' and Ass_Sub_Sys = 'OPT'")
+F.ODBC.Connection!Con.ExecuteAndReturn(V.Local.sSQL,V.Local.sScheduleNumber)
+F.Intrinsic.String.Left(V.Local.sScheduleNumber,6,V.Local.sScheduleNumber)
+
+F.Intrinsic.Math.Add(V.Local.sScheduleNumber.Long,1,V.Local.fSched)
+F.Global.General.SaveOption(400817,"0000","","","","",V.Local.fSched,"")
+
+F.Intrinsic.String.Build("Update Op_Header Set F_Numeric = '{0}' Where ID = 400817",V.Local.fSched,V.Local.sSql)
+F.ODBC.Connection!Con.Execute(V.Local.sSql)
+
+V.Local.sScheduleNumber.Set(V.Local.fSched)
+
+f.Intrinsic.String.Format(v.Local.sScheduleNumber,"000000",v.Local.sScheduleNumber)
+
+F.Intrinsic.String.Build("Update Last_PO Set Last_PO_Num = '{0}' + substring(Last_PO_Num,7,1) Where Ass_Sys = 'SCH' and Ass_Sub_Sys = 'OPT'",V.Local.sScheduleNumber,V.Local.sSql)
+F.ODBC.Connection!Con.Execute(V.Local.sSql)
+
+V.Local.iIncrement.Set(0)
+
+F.Intrinsic.Control.For(V.Local.i,0,V.DataTable.NestsFlex.RowCount--,1)
+	F.Intrinsic.Math.Add(V.Local.iIncrement,1,V.Local.iIncrement)
+    F.Intrinsic.String.Format(V.Local.iIncrement,"000000",V.Local.sIncrement)
+	   
+	F.Intrinsic.String.Build("SELECT PART FROM V_JOB_HEADER WHERE JOB = '{0}' AND SUFFIX = '{1}'",V.DataTable.NestsFlex(V.Local.i).Job!FieldValTrim,V.DataTable.NestsFlex(V.Local.i).Suffix!FieldValTrim,V.Local.sSQL)
+	F.ODBC.Connection!con.ExecuteAndReturn(V.Local.sSQL,V.Local.sPart)
+	
+	F.Intrinsic.String.Build("SELECT TOP 1 PART FROM V_JOB_OPERATIONS WHERE JOB = '{0}' AND SUFFIX = '{1}' AND SEQ = '{2}' ORDER BY SEQ ASC",V.DataTable.NestsFlex(V.Local.i).Job!FieldValTrim,V.DataTable.NestsFlex(V.Local.i).Suffix!FieldValTrim,V.DataTable.NestsFlex(V.Local.i).Labor Seq!FieldValTrim,V.Local.sSQL)
+	F.ODBC.Connection!con.ExecuteAndReturn(V.Local.sSQL,V.Local.sWC)
+	   
+	F.Data.DataTable.AddRow("6000","SchedNumber",V.Local.sScheduleNumber,"SchedIncrement",V.Local.sIncrement,"MatWO",V.DataTable.NestsFlex(V.Local.i).Job!FieldValTrim,"MatSuff",V.DataTable.NestsFlex(V.Local.i).Suffix!FieldValTrim,"MatSeq",V.DataTable.NestsFlex(V.Local.i).Material Seq!FieldValTrim,"LabWO",V.DataTable.NestsFlex(V.Local.i).Job!FieldValTrim,"LabSuff",V.DataTable.NestsFlex(V.Local.i).Suffix!FieldValTrim,"LabSeq",V.DataTable.NestsFlex(V.Local.i).Labor Seq!FieldValTrim,"LabWOPart",V.Local.sPart,"LabWorkCenter",V.Local.sWC,"SchedFromDate",V.Local.sDate,"SchedToDate",V.Local.sDate,"SchedFromDueDate",V.Local.sDate,"SchedToDueDate",V.Local.sDate)
+F.Intrinsic.Control.Next(V.Local.i)
+
+F.Intrinsic.Control.If(V.DataTable.6000.RowCount--,<>,-1)
+		F.Intrinsic.Control.CallSub(6000Sync)
+		
+		F.Data.DataTable.AddRow("900300", "StartDate", "000000", "EndDate", "000000", "StartFSNum", V.Local.sScheduleNumber.Trim, "StartFSSuffix","000", "EndFSNum", V.Local.sScheduleNumber.Trim, "EndFSSuffix", "000", "ShowMatl", "Y", "UseExtBarcode", "Y")
+		F.Intrinsic.String.Build("Select * From GCG_6364_Program_ISS Where ProgramName = '{0}'",V.Screen.FormIssMat!txtProgram.Text,V.Local.sSql)
+		F.Data.DataTable.CreateFromSQL("PN","con",V.Local.sSql,True)
+		F.Intrinsic.Control.If(V.DataTable.PN.RowCount--,=,-1)
+			F.Data.DataTable.AddRow("PN","ProgramName",V.Screen.FormIssMat!txtProgram.Text,"Flex_Sched",V.Local.sScheduleNumber.Trim,"Issue_Mat",False)
+		F.Intrinsic.Control.Else
+			F.Data.DataTable.SetValue("PN",-1,"Flex_Sched",V.Local.sScheduleNumber.Trim)
+		F.Intrinsic.Control.EndIf
+		F.Data.DataTable.SaveToDB("PN","con","GCG_6364_Program_ISS","ProgramName",256,"ProgramName@!@ProgramName*!*Flex_Sched@!@Flex_Sched*!*Issue_Mat@!@Issue_Mat")
+		F.Data.DataTable.Close("PN")
+		F.Intrinsic.Control.CallSub(900300Sync)
+F.Intrinsic.Control.EndIf
+
+F.Data.DataTable.DeleteRow("NestsFlex")
+F.Data.DataTable.AcceptChanges("NestsFlex")
+
+F.ODBC.Connection!con.Close
+
+Gui.FormIssMat..Enabled(True)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Create_FlexSchedule_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_Sigmnest_Issue_Mat.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FormIssMat_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.Create_FlexSchedule.End
+
+Program.Sub.PreFolderCheck.Start
+F.Intrinsic.Control.SetErrorHandler("PreFolderCheck_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+V.Local.sSql.Declare(String,"")
+
+F.ODBC.Connection!con.OpenCompanyConnection
+
+'getting signma nest connection info
+F.Intrinsic.String.Build("Select Sig_Provider, Sig_Server, Sig_Data, UID, PWD From GCG_6364_Sigma_Dir Where Company = '{0}'",V.Caller.CompanyCode,V.Local.sSql)
+F.Data.DataTable.CreateFromSQL("SigDir","Con",V.Local.sSql,True)
+
+F.Intrinsic.Control.If(v.DataTable.SigDir.RowCount--,<>,-1)
+	F.Intrinsic.Control.If(V.DataTable.SigDir(V.DataTable.SigDir.RowCount--).Sig_Provider!FieldValTrim,<>,"","OR",V.DataTable.SigDir(V.DataTable.SigDir.RowCount--).Sig_Server!FieldValTrim,<>,"",V.DataTable.SigDir(V.DataTable.SigDir.RowCount--).Sig_Data!FieldValTrim,<>,"",V.DataTable.SigDir(V.DataTable.SigDir.RowCount--).UID!FieldValTrim,<>,"",V.DataTable.SigDir(V.DataTable.SigDir.RowCount--).PWD!FieldValTrim,<>,"")
+		F.Intrinsic.String.Build("Provider={0};Server={1};Database={2};Uid={3};Pwd={4};",V.DataTable.SigDir(V.DataTable.SigDir.RowCount--).Sig_Provider!FieldValTrim,V.DataTable.SigDir(V.DataTable.SigDir.RowCount--).Sig_Server!FieldValTrim,V.DataTable.SigDir(V.DataTable.SigDir.RowCount--).Sig_Data!FieldValTrim,V.DataTable.SigDir(V.DataTable.SigDir.RowCount--).UID!FieldValTrim,V.DataTable.SigDir(V.DataTable.SigDir.RowCount--).PWD!FieldValTrim,V.Global.sCon)
+	F.Intrinsic.Control.Else
+		F.Intrinsic.UI.Msgbox("Go to Menu Item: Shop Floor Control > File > SigmaNest Integration Directories (6364) to set up a SigmanNest Connection Data.","Attention")
+		F.ODBC.Connection!Con.Close
+		F.Intrinsic.Control.End
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndIf
+
+F.ODBC.Connection!Con.Close
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("PreFolderCheck_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_Sigmnest_Issue_Mat.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FormIssMat_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.PreFolderCheck.End
+
+Program.Sub.Comments.Start
+${$5$}$2.0.0.0$}$2
+${$6$}$rking$}$20230817140334901$}$QNdZLVy4bWuiWa9jh1ZTiKHvMPldSPXePE09KioGX24hi0jixnJeFd9Z7OZkYfzB4rzXqlo8vjE=
+Program.Sub.Comments.End
