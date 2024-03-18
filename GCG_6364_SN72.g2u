@@ -1,0 +1,116 @@
+﻿Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+F.Intrinsic.Control.SetErrorHandler("Main_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+V.Local.dDate.Declare(Date)
+V.Local.sSql.Declare(String,"")
+V.Local.sCon.Declare(String,"")
+V.Local.sInputPath.Declare(String,"")
+V.Local.sFields.Declare(String,"TransType,District,TransID,OrderNo")
+V.Local.sCol.Declare(String,"TransType*!*District*!*TransID*!*OrderNo")
+V.Local.sDate.Declare(String,"")
+V.Local.sTime.Declare(String,"")
+V.Local.sFileName.Declare(String,"")
+V.Local.sData.Declare(String,"")
+
+F.Intrinsic.String.Format(V.Ambient.Date,"MMDDYY",V.Local.sDate)
+F.Intrinsic.String.Format(V.Ambient.Time,"hHnNsS",V.Local.sTime)
+F.Intrinsic.String.Build("{0}-{1}",V.Local.sDate,V.Local.sTime,V.Local.sDate)
+
+Function.Intrinsic.UI.UsePixels ' Allows you to use Pixels instead of Twips throughout
+
+F.ODBC.Connection!con.OpenCompanyConnection
+
+F.Intrinsic.String.Build("Select Input_Dir From GCG_6364_Sigma_Dir Where Company = '{0}'",V.Caller.CompanyCode,V.Local.sSql)
+F.ODBC.Connection!Con.ExecuteAndReturn(V.Local.sSql,V.Local.sInputPath)
+
+'getting signma nest connection info
+F.Intrinsic.String.Build("Select Sig_Provider, Sig_Server, Sig_Data, UID, PWD From GCG_6364_Sigma_Dir Where Company = '{0}'",V.Caller.CompanyCode,V.Local.sSql)
+F.Data.DataTable.CreateFromSQL("SigDir","Con",V.Local.sSql,True)
+
+F.Intrinsic.Control.If(v.DataTable.SigDir.RowCount--,<>,-1)
+	F.Intrinsic.Control.If(V.DataTable.SigDir(V.DataTable.SigDir.RowCount--).Sig_Provider!FieldValTrim,<>,"","OR",V.DataTable.SigDir(V.DataTable.SigDir.RowCount--).Sig_Server!FieldValTrim,<>,"",V.DataTable.SigDir(V.DataTable.SigDir.RowCount--).Sig_Data!FieldValTrim,<>,"",V.DataTable.SigDir(V.DataTable.SigDir.RowCount--).UID!FieldValTrim,<>,"",V.DataTable.SigDir(V.DataTable.SigDir.RowCount--).PWD!FieldValTrim,<>,"")
+		F.Intrinsic.String.Build("Provider={0};Server={1};Database={2};Uid={3};Pwd={4};",V.DataTable.SigDir(V.DataTable.SigDir.RowCount--).Sig_Provider!FieldValTrim,V.DataTable.SigDir(V.DataTable.SigDir.RowCount--).Sig_Server!FieldValTrim,V.DataTable.SigDir(V.DataTable.SigDir.RowCount--).Sig_Data!FieldValTrim,V.DataTable.SigDir(V.DataTable.SigDir.RowCount--).UID!FieldValTrim,V.DataTable.SigDir(V.DataTable.SigDir.RowCount--).PWD!FieldValTrim,V.Local.sCon)
+	F.Intrinsic.Control.Else
+		F.Intrinsic.Control.End
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndIf
+
+F.ODBC.Connection!Con.Close
+
+F.Intrinsic.Date.DateAdd("D",-7,V.Ambient.Date,V.Local.dDate)
+
+F.ODBC.Connection!conS.OpenConnection(V.Local.sCon)
+
+f.Data.Datatable.CreateFromSQL("WO","conS","select WONumber as OrderNo from WO",True)
+
+F.ODBC.Connection!conS.Close
+
+F.Intrinsic.Control.If(V.DataTable.WO.RowCount--,<>,-1)
+	F.Data.DataTable.AddColumn("WO","TransType",String,"SN72")
+	F.Data.DataTable.AddColumn("WO","District",Long,1)
+	F.Data.DataTable.AddColumn("WO","TransID",String,"")
+	F.Data.DataTable.AddColumn("WO","Closed",String)
+	F.Data.DataTable.AddExpressionColumn("WO","JS",String,"SUBSTRING([OrderNo],1,10)")
+
+	F.ODBC.Connection!con.OpenCompanyConnection
+	F.Intrinsic.String.Build("Select Job+'-'+Suffix, 'Y' as Closed From V_Job_Header Where Date_Closed <> '1900-01-01' and Date_Closed < '{0}'",V.Local.dDate.PervasiveDate,V.Local.sSql)
+	F.Data.Dictionary.CreateFromSQL("JS",Con,V.Local.sSql)
+	F.ODBC.Connection!Con.Close
+	F.Data.Dictionary.SetDefaultReturn("JS","N")
+	F.Data.DataTable.FillFromDictionary("WO","JS","JS","Closed")
+
+	F.Data.Dictionary.Close("JS")
+	F.Intrinsic.Control.If(V.Local.sInputPath.Trim,<>,"")
+		F.Intrinsic.Control.If(V.Local.sInputPath.Right1,=,"\")
+			F.Intrinsic.String.Build("{0}SigmaNest{1}.csv",V.Local.sInputPath,V.Local.sDate,V.Local.sFileName)
+		F.Intrinsic.Control.Else
+			F.Intrinsic.String.Build("{0}\SigmaNest{1}.csv",V.Local.sInputPath,V.Local.sDate,V.Local.sFileName)
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.EndIf
+	
+	F.Data.DataView.Create("WO","Temp",22,"Closed = 'Y'","")
+	F.Data.DataView.ToString("WO","Temp",V.Local.sCol,",",V.Ambient.NewLine,V.Local.sData)
+	F.data.DataView.Close("WO","Temp")
+	F.Intrinsic.String.Build("{0}{1}{2}",V.Local.sFields,V.Ambient.NewLine,V.Local.sData,V.Local.sData)
+	F.Intrinsic.File.String2File(V.Local.sFileName,V.Local.sData)
+F.Intrinsic.Control.EndIf
+
+F.Data.DataTable.Close("WO")
+
+F.Intrinsic.Control.CallSub(Exit)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Main_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_SN72.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(Exit)
+Function.Intrinsic.Control.EndIf
+Program.Sub.Main.End
+
+Program.Sub.Exit.Start
+F.Intrinsic.Control.SetErrorHandler("Exit_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+
+F.Intrinsic.Control.End
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Exit_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.Control.End
+Function.Intrinsic.Control.EndIf
+Program.Sub.Exit.End
+
+Program.Sub.Comments.Start
+${$5$}$20.1.8586.23728$}$1
+${$6$}$rking$}$20230728080158863$}$QNdZLVy4bWuiWa9jh1ZTiKHvMPldSPXeibysbw1rt7pQHImggbfjpgD3Gk90CNiEnphzByU+6Yc=
+Program.Sub.Comments.End
