@@ -1,0 +1,253 @@
+Program.Sub.ScreenSU.Start
+Gui.FormSigmaFileMaint..Create
+Gui.FormSigmaFileMaint..Caption("SigmaNest File Maintenance")
+Gui.FormSigmaFileMaint..Size(8490,4305)
+Gui.FormSigmaFileMaint..MinX(0)
+Gui.FormSigmaFileMaint..MinY(0)
+Gui.FormSigmaFileMaint..Position(0,0)
+Gui.FormSigmaFileMaint..BackColor(-2147483633)
+Gui.FormSigmaFileMaint..MousePointer(0)
+Gui.FormSigmaFileMaint..Event(UnLoad,FormSigmaFileMaint_UnLoad)
+Gui.FormSigmaFileMaint.GsGridControlSigmaFileMaint.Create(GsGridControl)
+Gui.FormSigmaFileMaint.GsGridControlSigmaFileMaint.Size(8100,3195)
+Gui.FormSigmaFileMaint.GsGridControlSigmaFileMaint.Position(105,105)
+Gui.FormSigmaFileMaint.GsGridControlSigmaFileMaint.Event(CellValueChanged,GsGridControlSigmaFileMaint_CellValueChanged)
+Gui.FormSigmaFileMaint.cmdSave.Create(Button)
+Gui.FormSigmaFileMaint.cmdSave.Size(855,375)
+Gui.FormSigmaFileMaint.cmdSave.Position(105,3375)
+Gui.FormSigmaFileMaint.cmdSave.Caption("Save")
+Gui.FormSigmaFileMaint.cmdSave.Event(Click,cmdSave_Click)
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+F.Intrinsic.Control.Try
+	V.Local.sError.Declare(String,"")
+	
+	'set properties to the grid
+	F.Intrinsic.Control.CallSub(Set_Properties)
+	'getting dat to populate grid
+	F.Intrinsic.Control.CallSub(Get_Data)
+	
+	Gui.FormSigmaFileMaint.cmdSave.Enabled(False)
+	
+	'showing form
+	Gui.FormSigmaFileMaint..Show
+	
+	F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+		F.Intrinsic.String.Build("Project: {0}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}","GCG_6364_Sigmnest_Maint.g2u",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub(FormSigmaFileMaint_UnLoad)
+	F.Intrinsic.Control.EndIf
+Function.Intrinsic.Control.EndTry
+Program.Sub.Main.End
+
+Program.Sub.FormSigmaFileMaint_UnLoad.Start
+F.Intrinsic.Control.Try
+	V.Local.sError.Declare(String,"")
+	
+	'checking connection and closing if open
+	F.Intrinsic.Control.If(V.ODBC.Con.State,=,1)
+		F.ODBC.Connection!Con.Close
+	F.Intrinsic.Control.EndIf
+	'ending program
+	F.Intrinsic.Control.End
+	
+	F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+		F.Intrinsic.Control.End
+	F.Intrinsic.Control.EndIf
+Function.Intrinsic.Control.EndTry
+Program.Sub.FormSigmaFileMaint_UnLoad.End
+
+Program.Sub.GsGridControlSigmaFileMaint_CellValueChanged.Start
+F.Intrinsic.Control.Try
+	V.Local.sError.Declare(String,"")
+	V.Local.bRet.Declare(Boolean,False)
+	V.Local.iRet.Declare(Long,0)
+	V.Local.sPath.Declare(String,"")
+	V.Local.iLength.Declare(Long,0)
+	
+	
+	F.Intrinsic.Control.If(V.Args.RowIndex,>,4)
+		F.Intrinsic.File.DirExists(V.Args.Value,V.Local.bRet)
+		
+		'checking if dir exists if check to see if the path exists if so create the dir if the user wants to
+		'if user doesn't want to create the dir remove text from grid.
+		F.Intrinsic.Control.If(V.Local.bRet,=,False)
+			F.Intrinsic.UI.Msgbox("Directory Doesn't Exist.  Would you like to creat it?","Directory Location",4,V.Local.iRet)
+			F.Intrinsic.Control.If(V.Local.iRet,=,6)
+				F.Intrinsic.String.Split(V.Args.Value,"\",V.Local.sPath)
+				F.Intrinsic.Control.If(V.Local.sPath.UBound,>,0)
+					F.Intrinsic.Math.Sub(V.Args.Value.Length,V.Local.sPath(V.Local.sPath.UBound).Length,V.Local.iLength)
+					F.Intrinsic.String.Left(V.Args.Value,V.Local.iLength,V.Local.sPath)
+					F.Intrinsic.File.PathExists(V.Local.sPath,V.Local.bRet)
+					F.Intrinsic.Control.If(v.Local.bRet)
+						F.Intrinsic.File.CreateDir(V.Args.Value)
+					F.Intrinsic.Control.Else
+						F.Intrinsic.UI.Msgbox("Path to Directory Doesn't Exist")
+						F.Data.DataTable.SetValue("SigmaNest",V.Args.RowIndex,"Dir_Loc","")
+						F.Intrinsic.Control.ExitSub
+					F.Intrinsic.Control.EndIf
+				F.Intrinsic.Control.Else
+					F.Intrinsic.UI.Msgbox("Path to Directory Doesn't Exist")
+					F.Data.DataTable.SetValue("SigmaNest",V.Args.RowIndex,"Dir_Loc","")
+					F.Intrinsic.Control.ExitSub
+				F.Intrinsic.Control.EndIf
+			F.Intrinsic.Control.Else
+				F.Data.DataTable.SetValue("SigmaNest",V.Args.RowIndex,"Dir_Loc","")
+				F.Intrinsic.Control.ExitSub
+			F.Intrinsic.Control.EndIf
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.EndIf
+	Gui.FormSigmaFileMaint.cmdSave.Enabled(True)
+	
+	F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+		F.Intrinsic.String.Build("Project: {0}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}","GCG_6364_Sigmnest_Maint.g2u",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub(FormSigmaFileMaint_UnLoad)
+	F.Intrinsic.Control.EndIf
+Function.Intrinsic.Control.EndTry
+Program.Sub.GsGridControlSigmaFileMaint_CellValueChanged.End
+
+Program.Sub.cmdSave_Click.Start
+F.Intrinsic.Control.Try
+	V.Local.sError.Declare(String,"")
+	V.Local.sSql.Declare(String,"")
+	
+	'saving data from table
+	F.Intrinsic.String.Build("Select Company, Sig_Provider, Sig_Server, Sig_Data, UID, PWD, Input_Dir, Complete_Dir, Bom_Dir, Remnants_Dir, Image_Dir From GCG_6364_Sigma_Dir Where Company = '{0}'",V.Caller.CompanyCode,V.Local.sSql)
+	
+	F.ODBC.Connection!Con.OpenCompanyConnection
+	
+	F.Data.DataTable.CreateFromSQL("DTSave","Con",V.Local.sSql,True)
+
+	F.Intrinsic.Control.If(V.DataTable.DTSave.RowCount--,<>,-1)
+		F.Data.DataTable.SetValue("DTSave",-1,"Sig_Provider",V.DataTable.SigmaNest(0).Dir_Loc!FieldValTrim,"Sig_Server",V.DataTable.SigmaNest(1).Dir_Loc!FieldValTrim,"Sig_Data",V.DataTable.SigmaNest(2).Dir_Loc!FieldValTrim,"UID",V.DataTable.SigmaNest(3).Dir_Loc!FieldValTrim,"PWD",V.DataTable.SigmaNest(4).Dir_Loc!FieldValTrim,"Input_Dir",V.DataTable.SigmaNest(5).Dir_Loc!FieldValTrim,"Complete_Dir",V.DataTable.SigmaNest(7).Dir_Loc!FieldValTrim,"Bom_Dir",V.DataTable.SigmaNest(6).Dir_Loc!FieldValTrim,"Remnants_Dir",V.DataTable.SigmaNest(8).Dir_Loc!FieldValTrim,"Image_Dir",V.DataTable.SigmaNest(9).Dir_Loc!FieldValTrim)
+	F.Intrinsic.Control.Else
+		F.Data.DataTable.AddRow("DTSave","Company",V.Caller.CompanyCode,"Sig_Provider",V.DataTable.SigmaNest(0).Dir_Loc!FieldValTrim,"Sig_Server",V.DataTable.SigmaNest(1).Dir_Loc!FieldValTrim,"Sig_Data",V.DataTable.SigmaNest(2).Dir_Loc!FieldValTrim,"UID",V.DataTable.SigmaNest(3).Dir_Loc!FieldValTrim,"PWD",V.DataTable.SigmaNest(4).Dir_Loc!FieldValTrim,"Input_Dir",V.DataTable.SigmaNest(5).Dir_Loc!FieldValTrim,"Complete_Dir",V.DataTable.SigmaNest(7).Dir_Loc!FieldValTrim,"Bom_Dir",V.DataTable.SigmaNest(6).Dir_Loc!FieldValTrim,"Remnants_Dir",V.DataTable.SigmaNest(8).Dir_Loc!FieldValTrim,"Image_Dir",V.DataTable.SigmaNest(9).Dir_Loc!FieldValTrim)
+	F.Intrinsic.Control.EndIf
+	
+	Gui.FormSigmaFileMaint.cmdSave.Enabled(False)
+	
+	F.Data.DataTable.SaveToDB("DTSave","Con","GCG_6364_Sigma_Dir","Company",7)
+	
+	F.ODBC.Connection!Con.Close
+	
+	F.Data.DataTable.Close("DTSave")
+	
+	F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+		F.Intrinsic.String.Build("Project: {0}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}","GCG_6364_Sigmnest_Maint.g2u",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub(FormSigmaFileMaint_UnLoad)
+	F.Intrinsic.Control.EndIf
+Function.Intrinsic.Control.EndTry
+Program.Sub.cmdSave_Click.End
+
+Program.Sub.Set_Properties.Start
+F.Intrinsic.Control.Try
+	V.Local.sError.Declare(String,"")
+	
+	'setting anchors and properites for the grid
+	Gui.FormSigmaFileMaint.cmdSave.Anchor(6)
+	Gui.FormSigmaFileMaint.GsGridControlSigmaFileMaint.Anchor(15)
+	
+	F.Data.DataTable.Create("SigmaNest",True)
+	F.Data.DataTable.AddColumn("SigmaNest","A","String")
+	F.Data.DataTable.AddColumn("SigmaNest","Dir_Loc","String")
+	
+	F.Data.DataTable.AddRow("SigmaNest","A","PROVIDER::")
+	F.Data.DataTable.AddRow("SigmaNest","A","SERVER::")
+	F.Data.DataTable.AddRow("SigmaNest","A","DATABASE::")
+	F.Data.DataTable.AddRow("SigmaNest","A","UID::")
+	F.Data.DataTable.AddRow("SigmaNest","A","PWD::")
+	F.Data.DataTable.AddRow("SigmaNest","A","INPUT::")
+	F.Data.DataTable.AddRow("SigmaNest","A","BOM::")
+	F.Data.DataTable.AddRow("SigmaNest","A","COMPLETE::")
+	F.Data.DataTable.AddRow("SigmaNest","A","REMNANTS::")
+	F.Data.DataTable.AddRow("SigmaNest","A","IMAGE::")
+	
+	Gui.FormSigmaFileMaint.GsGridControlSigmaFileMaint.AddGridviewFromDatatable("SigmaNest","SigmaNest")
+	Gui.FormSigmaFileMaint.GsGridControlSigmaFileMaint.SetGridviewProperty("SigmaNest","AllowSort",False)
+	Gui.FormSigmaFileMaint.GsGridControlSigmaFileMaint.SetGridviewProperty("SigmaNest","AllowColumnMoving",False)
+	
+	Gui.FormSigmaFileMaint.GsGridControlSigmaFileMaint.SetColumnProperty("SigmaNest","A","Caption"," ")
+	Gui.FormSigmaFileMaint.GsGridControlSigmaFileMaint.SetColumnProperty("SigmaNest","A","ReadOnly",True)
+	Gui.FormSigmaFileMaint.GsGridControlSigmaFileMaint.SetColumnProperty("SigmaNest","A","AllowEdit",False)
+	Gui.FormSigmaFileMaint.GsGridControlSigmaFileMaint.SetColumnProperty("SigmaNest","A","MaxWidth","100")
+	Gui.FormSigmaFileMaint.GsGridControlSigmaFileMaint.SetColumnProperty("SigmaNest","A","TabStop",False)
+	Gui.FormSigmaFileMaint.GsGridControlSigmaFileMaint.SetColumnProperty("SigmaNest","A","headerforecolor", v.Color.PRI-GSS-00)
+	Gui.FormSigmaFileMaint.GsGridControlSigmaFileMaint.SetColumnProperty("SigmaNest","A","headerfontbold", true)
+	Gui.FormSigmaFileMaint.GsGridControlSigmaFileMaint.SetColumnProperty("SigmaNest","Dir_Loc","Caption","SNLIC")
+	Gui.FormSigmaFileMaint.GsGridControlSigmaFileMaint.SetColumnProperty("SigmaNest","Dir_Loc","ReadOnly",False)
+	Gui.FormSigmaFileMaint.GsGridControlSigmaFileMaint.SetColumnProperty("SigmaNest","Dir_Loc","AllowEdit",True)
+	Gui.FormSigmaFileMaint.GsGridControlSigmaFileMaint.SetColumnProperty("SigmaNest","Dir_Loc","headerforecolor", v.Color.PRI-GSS-00)
+	Gui.FormSigmaFileMaint.GsGridControlSigmaFileMaint.SetColumnProperty("SigmaNest","Dir_Loc","headerfontbold", true)
+	
+	Gui.FormSigmaFileMaint.GsGridControlSigmaFileMaint.MainView("SigmaNest")
+	
+	Gui.FormSigmaFileMaint.GsGridControlSigmaFileMaint.FocusCell("SigmaNest",0,1)
+	
+	F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+		F.Intrinsic.String.Build("Project: {0}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}","GCG_6364_Sigmnest_Maint.g2u",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub(FormSigmaFileMaint_UnLoad)
+	F.Intrinsic.Control.EndIf
+Function.Intrinsic.Control.EndTry
+Program.Sub.Set_Properties.End
+
+Program.Sub.Get_Data.Start
+F.Intrinsic.Control.Try
+	V.Local.sError.Declare(String,"")
+	V.Local.i.Declare(Long,0)
+	V.Local.sSql.Declare(String,"")
+	
+	'getting data from table
+	F.Intrinsic.String.Build("Select Company, Sig_Provider, Sig_Server, Sig_Data, UID, PWD, Input_Dir, Complete_Dir, Bom_Dir, Remnants_Dir, Image_Dir From GCG_6364_Sigma_Dir Where Company = '{0}'",V.Caller.CompanyCode,V.Local.sSql)
+	
+	F.ODBC.Connection!Con.OpenCompanyConnection
+	
+	F.Data.DataTable.CreateFromSQL("DTPop","Con",V.Local.sSql,True)
+	
+	F.Intrinsic.Control.If(V.DataTable.DTPop.RowCount--,<>,-1)
+		F.Data.DataTable.SetValue("SigmaNest",0,"Dir_Loc",V.DataTable.DTPop(V.DataTable.DTPop.RowCount--).Sig_Provider!FieldValTrim)
+		F.Data.DataTable.SetValue("SigmaNest",1,"Dir_Loc",V.DataTable.DTPop(V.DataTable.DTPop.RowCount--).Sig_Server!FieldValTrim)
+		F.Data.DataTable.SetValue("SigmaNest",2,"Dir_Loc",V.DataTable.DTPop(V.DataTable.DTPop.RowCount--).Sig_Data!FieldValTrim)
+		F.Data.DataTable.SetValue("SigmaNest",3,"Dir_Loc",V.DataTable.DTPop(V.DataTable.DTPop.RowCount--).UID!FieldValTrim)
+		F.Data.DataTable.SetValue("SigmaNest",4,"Dir_Loc",V.DataTable.DTPop(V.DataTable.DTPop.RowCount--).PWD!FieldValTrim)
+		F.Data.DataTable.SetValue("SigmaNest",5,"Dir_Loc",V.DataTable.DTPop(V.DataTable.DTPop.RowCount--).Input_Dir!FieldValTrim)
+		F.Data.DataTable.SetValue("SigmaNest",6,"Dir_Loc",V.DataTable.DTPop(V.DataTable.DTPop.RowCount--).Bom_Dir!FieldValTrim)
+		F.Data.DataTable.SetValue("SigmaNest",7,"Dir_Loc",V.DataTable.DTPop(V.DataTable.DTPop.RowCount--).Remnants_Dir!FieldValTrim)
+		F.Data.DataTable.SetValue("SigmaNest",8,"Dir_Loc",V.DataTable.DTPop(V.DataTable.DTPop.RowCount--).Image_Dir!FieldValTrim)
+	F.Intrinsic.Control.EndIf
+	
+	F.ODBC.Connection!Con.Close
+	
+	F.Data.DataTable.Close("DTPop")
+	
+	F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+		F.Intrinsic.String.Build("Project: {0}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}","GCG_6364_Sigmnest_Maint.g2u",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub(FormSigmaFileMaint_UnLoad)
+	F.Intrinsic.Control.EndIf
+Function.Intrinsic.Control.EndTry
+Program.Sub.Get_Data.End
