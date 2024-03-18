@@ -1,0 +1,193 @@
+﻿Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+F.Intrinsic.Control.SetErrorHandler("Main_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+V.Local.sReceiver.Declare(String,"")
+
+F.Intrinsic.Control.SelectCase(V.Caller.Hook)
+	F.Intrinsic.Control.Case(15040)
+		'Receiver Num
+		'Receiver Suffix
+		F.Intrinsic.String.Build("{0}{1}",V.Passed.000010,V.Passed.000153,V.Local.sReceiver)
+		
+		F.Intrinsic.Control.If(V.Local.sReceiver.Trim,<>,"")
+			F.Intrinsic.Control.CallSub(Get_NewSheets,"Receiver",V.Local.sReceiver)
+		F.Intrinsic.Control.EndIf
+		
+		F.Intrinsic.Control.CallSub(Exit)
+		
+	F.Intrinsic.Control.CaseElse
+		F.Intrinsic.Control.End
+		
+F.Intrinsic.Control.EndSelect
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Main_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_Sigmnest_New_Sheets.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(Exit)
+Function.Intrinsic.Control.EndIf
+Program.Sub.Main.End
+
+Program.Sub.Exit.Start
+F.Intrinsic.Control.SetErrorHandler("Exit_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+
+F.Intrinsic.Control.End
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Exit_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.Control.End
+Function.Intrinsic.Control.EndIf
+Program.Sub.Exit.End
+
+Program.Sub.Get_NewSheets.Start
+F.Intrinsic.Control.SetErrorHandler("Get_NewSheets_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+V.Local.sSql.Declare(String,"")
+V.Local.sInputPath.Declare(String,"")
+V.Local.sFields.Declare(String,"TransType,District,TransID,OrderNo,ItemName,Oty,Material,Thickness,Customer,Length,Width,HeatNumber,ItemType,BinNumber,Location,Mill,PrimeCode,Param1,Param2,Param5,ItemData9")
+V.Local.sCol.Declare(String,"TransType*!*District*!*DmyCol*!*DmyCol*!*SheetNO*!*Qty_Received*!*Desc*!*Thickness*!*DmyCol*!*Length*!*Width*!*Heat*!*ItemType*!*Bin*!*DmyCol*!*DmyCol*!*Part*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol")
+V.Local.sData.Declare(String,"")
+V.Local.bRet.Declare(Boolean,False)
+V.Local.sDate.Declare(String,"")
+V.Local.sTime.Declare(String,"")
+V.Local.sMsg.Declare(String,"")
+V.Local.sFileName.Declare(String,"")
+V.Local.i.Declare(Long,0)
+V.Local.iCount.Declare(Long,0)
+V.Local.iR.Declare(Long,0)
+V.Local.sSheet.Declare(String,"")
+
+V.Local.sFields.Set("TransType,District,TransID,OrderNo,ItemName,Qty,Material,Thickness,DueDate,Customer,DwgNumber,Priority,ProgBy,Filename,Length,Width,Remark,RevNumber,Cost,HeatNumber,ItemType,OnHold,TypeDescr,BinNumber,Location,Mill,PrimeCode,ItemData1,ItemData2,ItemData3,ItemData4,OrderShape,ProgramName,ProgramRepeat,BatchFile,Process,StringData1,StringData2,StringData3,StringData4,StringData5,StringData6,StringData7,StringData8,Param1,Param2,Param3,Param4,Param5,Param6,Param7,Param8,IDNegTol,IDPosTol,ODNegTol,ODPosTol,ItemData5,ItemData6,ItemData7,ItemData8,ItemData9,ItemData10,ItemData11,ItemData12,ItemData13,ItemData14,ErrorTag,ItemID,PluginTag,ItemData15,ItemData16,ItemData17,ItemData18,SalesRep,DueDateFormula,TaxRate,StartDate,EndDate,TransPriority")
+V.Local.sCol.Set("TransType*!*District*!*DmyCol*!*DmyCol*!*SheetNO*!*Qty_Received*!*Desc*!*Thickness*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*Length*!*Width*!*DmyCol*!*DmyCol*!*DmyCol*!*Heat*!*ItemType*!*DmyCol*!*DmyCol*!*Bin*!*DmyCol*!*DmyCol*!*Part*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol*!*DmyCol")
+
+F.Intrinsic.String.Format(V.Ambient.Date,"MMDDYY",V.Local.sDate)
+F.Intrinsic.String.Format(V.Ambient.Time,"hHnNsS",V.Local.sTime)
+F.Intrinsic.String.Build("{0}-{1}",V.Local.sDate,V.Local.sTime,V.Local.sDate)
+
+F.ODBC.Connection!Con.OpenCompanyConnection(999)
+
+F.Intrinsic.String.Build("Select Input_Dir From GCG_6364_Sigma_Dir Where Company = '{0}'",V.Caller.CompanyCode,V.Local.sSql)
+F.ODBC.Connection!Con.ExecuteAndReturn(V.Local.sSql,V.Local.sInputPath)
+
+F.Intrinsic.String.Build("select concat(concat(Receiver_No,PURCHASE_ORDER),PO_LINE)+'0' as SHEETNO, Receiver_No, Purchase_Order, PO_Line, rtrim(a.Part) as Part, Qty_Received from PO_RECEIVER a Join V_Inventory_Mst2 b on a.Part = b.Part Where ucase(rtrim(Text_Info1)) = 'SIGMANEST' and Receiver_No = '{0}' and Qty_Received > 0;",V.Args.Receiver,V.Local.sSql)
+F.Data.DataTable.CreateFromSQL("ReceiverTemp","con",V.Local.sSql,True)
+
+F.Data.DataTable.Create("Receiver",True)
+F.Data.DataTable.AddColumn("Receiver","SHEETNO",String)
+F.Data.DataTable.AddColumn("Receiver","TransType",String,"SN94")
+F.Data.DataTable.AddColumn("Receiver","District",Long,1)
+F.Data.DataTable.AddColumn("Receiver","ItemType",Long,0)
+F.Data.DataTable.AddColumn("Receiver","DmyCol",String)
+F.Data.DataTable.AddColumn("Receiver","Bin",String)
+F.Data.DataTable.AddColumn("Receiver","Heat",String)
+F.Data.DataTable.AddColumn("Receiver","Desc",String)
+F.Data.DataTable.AddColumn("Receiver","Length",Float)
+F.Data.DataTable.AddColumn("Receiver","Width",Float)
+F.Data.DataTable.AddColumn("Receiver","Thickness",Float)
+F.Data.DataTable.AddColumn("Receiver","Qty_Received",Float)
+F.Data.DataTable.AddColumn("Receiver","Part",String)
+
+F.Intrinsic.Control.For(V.Local.iR,0,V.DataTable.ReceiverTemp.RowCount--,1)
+	V.Local.iCount.Set(0)
+'	F.Intrinsic.String.Build("Select concat(concat(RECEIVER,PURCHASE_ORDER),PO_LINE) as SHEETNO, Bin, Heat, Quantity From V_Item_History Where Receiver = '{0}'",V.Args.Receiver,V.Local.sSql)
+	F.Intrinsic.String.Build("select concat(concat(a.RECEIVER,a.PURCHASE_ORDER),a.PO_LINE) as SHEETNO, a.Bin, a.Heat, IF (Factor_Conversion > 0 , Quantity / Factor_Conversion , Quantity) as Qty_Rec, a.Part from V_ITEM_HISTORY a Left Join V_Inventory_Mstr b on a.Part = b.Part and a.Location = b.Location where a.receiver = '{0}' and a.Purchase_Order = '{1}' and PO_Line like '{2}%'",V.Args.Receiver,V.DataTable.ReceiverTemp(V.Local.iR).Purchase_Order!FieldValTrim,V.DataTable.ReceiverTemp(V.Local.iR).PO_Line!FieldValTrim,V.Local.sSql)
+	F.Data.DataTable.CreateFromSQL("ItemHist","con",V.Local.sSql,True)
+	F.Intrinsic.Control.If(v.DataTable.ItemHist.RowCount--,<>,-1)
+		F.Intrinsic.Control.For(V.Local.i,0,V.DataTable.ItemHist.RowCount--,1)
+			F.Intrinsic.Math.Add(V.Local.iCount,1,V.Local.iCount)
+			F.Intrinsic.String.Build("{0}{1}",V.DataTable.ItemHist(V.Local.i).SheetNo!FieldValTrim,V.Local.iCount,V.Local.sSheet)
+			F.Data.DataTable.AddRow("Receiver","SHEETNO",V.Local.sSheet,"Bin",V.DataTable.ItemHist(V.Local.i).Bin!FieldValTrim,"Heat",V.DataTable.ItemHist(V.Local.i).Heat!FieldValTrim,"Qty_Received",V.DataTable.ItemHist(V.Local.i).Qty_Rec!FieldValFloat,"Part",V.DataTable.ItemHist(V.Local.i).Part!FieldValTrim)
+		F.Intrinsic.Control.Next(V.Local.i)
+	F.Intrinsic.Control.EndIf
+	F.Data.DataTable.Close("ItemHist")
+F.Intrinsic.Control.Next(V.Local.iR)
+
+F.Intrinsic.Control.If(V.DataTable.Receiver.RowCount--,<>,-1)
+	F.Data.Dictionary.CreateFromSQL("Desc","con","Select rtrim(Part),ucase(rtrim(Text_Info2)) From V_Inventory_Mst2")
+	F.Data.Dictionary.SetDefaultReturn("Desc","")
+	
+	F.Data.DataTable.FillFromDictionary("Receiver","Desc","Part","Desc")
+	
+	F.Data.Dictionary.CreateFromSQL("Length","con","Select rtrim(Part), Length From V_Inventory_Mst2")
+	F.Data.Dictionary.SetDefaultReturn("Length","0")
+	
+	F.Data.DataTable.FillFromDictionary("Receiver","Length","Part","Length")
+	
+	F.Data.Dictionary.CreateFromSQL("Width","con","Select rtrim(Part), Width From V_Inventory_Mst2")
+	F.Data.Dictionary.SetDefaultReturn("Width","0")
+	
+	F.Data.DataTable.FillFromDictionary("Receiver","Width","Part","Width")
+	
+	F.Data.Dictionary.CreateFromSQL("Thickness","con","Select rtrim(Part), Thickness From V_Inventory_Mst3")
+	F.Data.Dictionary.SetDefaultReturn("Thickness","0")
+	
+	F.Data.DataTable.FillFromDictionary("Receiver","Thickness","Part","Thickness")
+	
+	F.Data.Dictionary.Close("Desc")
+	F.Data.Dictionary.Close("Length")
+	F.Data.Dictionary.Close("Width")
+	F.Data.Dictionary.Close("Thickness")
+	
+	F.Data.DataView.Create("Receiver","Temp",22,"Heat <> ''","")
+	F.Intrinsic.Control.If(V.DataView.Receiver!Temp.RowCount--,<>,-1)
+		F.Intrinsic.Control.If(V.Local.sInputPath.Trim,=,"")
+			F.Intrinsic.Control.If(V.Caller.GlobalDir.Right1,=,"\")
+				F.Intrinsic.String.Build("{0}Custom\6364",V.Caller.GlobalDir,V.Local.sInputPath)
+			F.Intrinsic.Control.Else	
+				F.Intrinsic.String.Build("{0}\Custom\6364",V.Caller.GlobalDir,V.Local.sInputPath)
+			F.Intrinsic.Control.EndIf
+			F.Intrinsic.File.DirExists(V.Local.sInputPath,V.Local.bRet)
+			F.Intrinsic.Control.If(V.Local.bRet,=,False)
+				F.Intrinsic.File.CreateDir(V.Local.sInputPath)
+			F.Intrinsic.Control.EndIf
+			F.Intrinsic.String.Build("{0}\SigmaNest{1}.csv",V.Local.sInputPath,V.Local.sDate,V.Local.sFileName)
+			F.Intrinsic.String.Build("Go to Menu Item: Shop Floor Control > File > SigmaNest Integration Directories (6364) to set up a Input Directory.  Current csv File is saved to {0}",V.Local.sFileName,V.Local.sMsg)
+			F.Intrinsic.UI.Msgbox(V.Local.sMsg,"Attention")
+		F.Intrinsic.Control.Else
+			F.Intrinsic.Control.If(V.Local.sInputPath.Right1,=,"\")
+				F.Intrinsic.String.Build("{0}SigmaNest{1}.csv",V.Local.sInputPath,V.Local.sDate,V.Local.sFileName)
+			F.Intrinsic.Control.Else
+				F.Intrinsic.String.Build("{0}\SigmaNest{1}.csv",V.Local.sInputPath,V.Local.sDate,V.Local.sFileName)
+			F.Intrinsic.Control.EndIf
+		F.Intrinsic.Control.EndIf
+
+		F.Data.DataView.ToString("Receiver","Temp",V.Local.sCol,",",V.Ambient.NewLine,V.Local.sData)
+		F.data.DataView.Close("Receiver","Temp")
+		F.Intrinsic.String.Build("{0}{1}{2}",V.Local.sFields,V.Ambient.NewLine,V.Local.sData,V.Local.sData)
+		F.Intrinsic.File.String2File(V.Local.sFileName,V.Local.sData)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndIf
+
+F.Data.DataTable.Close("ReceiverTemp")
+F.Data.DataTable.Close("Receiver")
+
+F.ODBC.Connection!Con.Close
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Get_NewSheets_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_Sigmnest_New_Sheets.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(Exit)
+Function.Intrinsic.Control.EndIf
+Program.Sub.Get_NewSheets.End
+
+Program.Sub.Comments.Start
+${$5$}$2.0.0.0$}$2
+${$6$}$rking$}$20230817103711310$}$QNdZLVy4bWuiWa9jh1ZTiKHvMPldSPXePE09KioGX24WNMu427QblsHWMIdqlT1dv4scZcXIPZQ=
+Program.Sub.Comments.End
