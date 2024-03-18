@@ -1,0 +1,1396 @@
+﻿Program.Sub.ScreenSU.Start
+Gui.FNestExport..Create
+Gui.FNestExport..Caption("SigmaNest Export Interface")
+Gui.FNestExport..Size(17130,9495)
+Gui.FNestExport..MinX(20910)
+Gui.FNestExport..MinY(6000)
+Gui.FNestExport..Position(0,0)
+Gui.FNestExport..BackColor(-2147483633)
+Gui.FNestExport..MousePointer(0)
+Gui.FNestExport..Event(UnLoad,FNestExport_UnLoad)
+Gui.FNestExport.GsGCJobs.Create(GsGridControl)
+Gui.FNestExport.GsGCJobs.Size(16665,7785)
+Gui.FNestExport.GsGCJobs.Position(105,975)
+Gui.FNestExport.GsGCJobs.Event(ColumnFilterChanged,GsGCJobs_ColumnFilterChanged)
+Gui.FNestExport.GsGCJobs.Anchor(15)
+Gui.FNestExport.GsGCJobs.Event(RowCellClick,GsGCJobs_RowCellClick)
+Gui.FNestExport.dtpFromDate.Create(DatePicker)
+Gui.FNestExport.dtpFromDate.Size(2880,285)
+Gui.FNestExport.dtpFromDate.Position(210,525)
+Gui.FNestExport.dtpToDate.Create(DatePicker)
+Gui.FNestExport.dtpToDate.Size(2880,285)
+Gui.FNestExport.dtpToDate.Position(3330,525)
+Gui.FNestExport.cmdPopGrid.Create(Button)
+Gui.FNestExport.cmdPopGrid.Size(2880,405)
+Gui.FNestExport.cmdPopGrid.Position(6375,465)
+Gui.FNestExport.cmdPopGrid.Caption("Populate Grid")
+Gui.FNestExport.cmdPopGrid.FontSize(12)
+Gui.FNestExport.cmdPopGrid.Event(Click,cmdPopGrid_Click)
+Gui.FNestExport.cmdXP.Create(Button)
+Gui.FNestExport.cmdXP.Size(2880,405)
+Gui.FNestExport.cmdXP.Position(9450,465)
+Gui.FNestExport.cmdXP.Caption("Export")
+Gui.FNestExport.cmdXP.FontSize(12)
+Gui.FNestExport.cmdXP.Event(Click,cmdXP_Click)
+Gui.FNestExport.lbl1.Create(Label,"Scheduled Start Date",True,2625,255,0,210,210,True,0,"Arial",12,-2147483633,0)
+Gui.FNestExport.lbl1.FontStyle(True,False,False,False,False)
+Gui.FNestExport.lbl2.Create(Label,"Scheduled End Date",True,2505,255,0,3330,210,True,0,"Arial",12,-2147483633,0)
+Gui.FNestExport.lbl2.FontStyle(True,False,False,False,False)
+Gui.FNestExport.lbl3.Create(Label,"i",True,285,300,0,2820,210,True,2,"Arial",8,-2147483633,0)
+Gui.FNestExport.lbl3.FontStyle(True,True,False,False,False)
+Gui.FNestExport.lbl3.ForeColor(14772545)
+Gui.FNestExport.lbl3.ToolTip("Scheduled date only")
+Gui.FNestExport.lbl4.Create(Label,"i",True,270,300,0,5970,210,True,2,"Arial",8,-2147483633,0)
+Gui.FNestExport.lbl4.ForeColor(14772545)
+Gui.FNestExport.lbl4.ToolTip("Scheduled date only")
+Gui.FNestExport.lbl4.FontStyle(True,True,False,False,False)
+Gui.FNestExport.chkIncludeXP.Create(CheckBox)
+Gui.FNestExport.chkIncludeXP.Size(2025,360)
+Gui.FNestExport.chkIncludeXP.Position(12555,480)
+Gui.FNestExport.chkIncludeXP.Caption("Include Exported Jobs")
+Gui.FNestExport.chkIncludeXP.Value(1)
+Gui.FNestExport.chkPrintBCWODetail.Create(CheckBox)
+Gui.FNestExport.chkPrintBCWODetail.Size(2175,360)
+Gui.FNestExport.chkPrintBCWODetail.Position(14610,480)
+Gui.FNestExport.chkPrintBCWODetail.Caption("Print BarCode WO Detail")
+Gui.FNestExport.chkPrintBCWODetail.Event(Click,chkPrintBCWODetail_Click)
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+v.Global.sBarCodePath.Declare(String,"")
+v.Global.sFilter.Declare(String,"")
+V.Global.bLoadData.Declare(Boolean, True)
+V.Global.bViewWO.Declare(Boolean, False)
+V.Global.bEditWO.Declare(Boolean, False)
+V.Global.bViewPart.Declare(Boolean, False)
+V.Global.bEditPart.Declare(Boolean, False)
+V.Global.sInputPath.Declare(String,"")
+V.Global.sBomPath.Declare(String,"")
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+F.Intrinsic.Control.SetErrorHandler("Main_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+
+F.Intrinsic.Control.CallSub(SetIcon)
+
+F.Intrinsic.Control.CallSub(CheckPermissions)
+
+F.Intrinsic.Control.CallSub(Connection, "CONNECT", True)
+
+F.Intrinsic.Control.CallSub(PreFolderCheck)
+f.Intrinsic.Control.CallSub(LoadContextMenu)
+
+F.Intrinsic.Control.CallSub(cmdPopGrid_Click)
+gui.FNestExport..Show
+
+Gui.FNestExport..AlwaysOnTop(True)
+Gui.FNestExport..AlwaysOnTop(False)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Main_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_SIGMANEST_EXPORT.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FNestExport_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.Main.End
+
+Program.Sub.Serialize.Start
+'pass FORM, GRIDCONTROL, GRIDVIEW, REGID
+F.Intrinsic.Control.SetErrorHandler("Serialize_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+
+V.Local.sSerialize.Declare(String)
+V.Local.sForm.Declare(String)
+V.Local.sGridControl.Declare(String)
+V.Local.sGridView.Declare(String)
+V.Local.sREGID.Declare(String)
+
+V.Local.sForm.Set(V.Args.Form.Trim)
+V.Local.sGridControl.Set(V.Args.GridControl.Trim)
+V.Local.sGridView.Set(V.Args.GridView.Trim)
+V.Local.sREGID.Set(V.Args.REGID.Trim)
+
+GUI.[V.Local.sForm].[V.Local.sGridControl].Serialize(V.Local.sGridView, V.Local.sSerialize)
+F.Global.Registry.AddValue(V.Caller.User, V.Caller.CompanyCode, V.Local.sGridView, V.Local.sREGID, 1000, False, "Serialize", False, 0, -999.0 , 1/1/1980, 12:00:00 AM, V.Local.sSerialize)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Serialize_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_SIGMANEST_EXPORT.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FNestExport_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.Serialize.End
+
+Program.Sub.Deserialize.Start
+'pass FORM, GRIDCONTROL, GRIDVIEW, REGID
+F.Intrinsic.Control.SetErrorHandler("Deserialize_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+
+V.Local.sSerialize.Declare(String)
+V.Local.sForm.Declare(String)
+V.Local.sGridControl.Declare(String)
+V.Local.sGridView.Declare(String)
+V.Local.sREGID.Declare(String)
+
+V.Local.sForm.Set(V.Args.Form.Trim)
+V.Local.sGridControl.Set(V.Args.GridControl.Trim)
+V.Local.sGridView.Set(V.Args.GridView.Trim)
+V.Local.sREGID.Set(V.Args.REGID.Trim)
+
+F.Global.Registry.ReadValue(V.Caller.User, V.Caller.CompanyCode, V.Local.sGridView, V.Local.sREGID, 1000, 6, "", V.Local.sSerialize)
+F.Intrinsic.Control.If(V.Local.sSerialize.Trim,<>,"")
+	Gui.[V.Local.sForm].[V.Local.sGridControl].Deserialize(V.Local.sSerialize)
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Deserialize_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_SIGMANEST_EXPORT.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FNestExport_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.Deserialize.End
+
+Program.Sub.Connection.Start
+'open or close connection if necessary, keep track of all connections
+F.Intrinsic.Control.SetErrorHandler("Connection_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+
+V.Static.iConnections.Declare(Long)
+
+F.Intrinsic.Control.If(V.Args.Connect)
+	F.Intrinsic.Control.If(V.Static.iConnections, =, 0)
+		F.ODBC.Connection!Con.OpenCompanyConnection(500)
+	F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Math.Add(V.Static.iConnections, 1, V.Static.iConnections)
+F.Intrinsic.Control.Else
+	F.Intrinsic.Control.If(V.Static.iConnections, >, 0)
+		F.Intrinsic.Math.Sub(V.Static.iConnections, 1, V.Static.iConnections)
+		
+		F.Intrinsic.Control.If(V.Static.iConnections, =, 0)
+			F.ODBC.Connection!Con.Close
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Connection_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_SIGMANEST_EXPORT.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FNestExport_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.Connection.End
+
+Program.Sub.SetIcon.Start
+F.Intrinsic.Control.SetErrorHandler("SetIcon_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+V.Local.sForm.Declare(String)
+V.Local.bExists.Declare(Boolean)
+V.Local.sIcon.Declare(String)
+V.Local.iCounter.Declare(Long)
+
+F.Intrinsic.String.Build("{0}\ART\gss2.ico",V.Caller.GlobalDir,v.Local.sIcon)
+F.Intrinsic.File.Exists(V.Local.sIcon, V.Local.bExists)
+F.Intrinsic.Control.If(V.Local.bExists.Not)
+	F.Intrinsic.String.Build("{0}\GAB\GAS\gss2.ico",V.Caller.PluginsDir,v.Local.sIcon)
+	F.Intrinsic.File.Exists(V.Local.sIcon, V.Local.bExists)
+	F.Intrinsic.Control.If(V.Local.bExists.Not)
+		F.Intrinsic.Control.ExitSub
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.UI.GetFormList(V.Local.sForm)
+F.Intrinsic.String.Split(V.Local.sForm, "*!*", V.Local.sForm)
+
+F.Intrinsic.Control.For(V.Local.iCounter, 0, V.Local.sForm.UBound, 1)
+	Gui.[V.Local.sForm(V.Local.iCounter)]..Icon(V.Local.sIcon)
+F.Intrinsic.Control.Next(V.Local.iCounter)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("SetIcon_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_SIGMANEST_EXPORT.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FNestExport_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.SetIcon.End
+
+Program.Sub.FormatJobGrid.Start
+F.Intrinsic.Control.SetErrorHandler("FormatJobGrid_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+
+f.Data.Dataview.Create("JobData","JobDataVw",22)
+gui.FNestExport.GsGCJobs.AddGridviewFromDataview("JobsGrid","JobData","JobDataVw")
+
+GUI.FNestExport.GsGCJobs.SetGridviewProperty("JobsGrid", "OptionsViewColumnAutoWidth", False)
+
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Selected","headerforecolor", v.Color.PRI-GSS-00)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Selected","headerfontbold", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Selected","caption","Selected")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Selected","readonly", True)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Selected","allowedit", False)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Selected","MinWidth", 45)
+
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Job","headerforecolor", v.Color.PRI-GSS-00)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Job","headerfontbold", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Job","caption","Job")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Job","readonly", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Job","allowedit", false)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Job","MinWidth", 45)
+GUI.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Job","CellForeColor", "Blue")
+
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Suffix","headerforecolor", v.Color.PRI-GSS-00)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Suffix","headerfontbold", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Suffix","caption","Suffix")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Suffix","readonly", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Suffix","allowedit", false)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Suffix","MinWidth", 45)
+GUI.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Suffix","CellForeColor", "Blue")
+
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Seq","headerforecolor", v.Color.PRI-GSS-00)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Seq","headerfontbold", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Seq","caption","Seq")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Seq","readonly", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Seq","allowedit", false)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Seq","MinWidth", 45)
+
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","FGPART","headerforecolor", v.Color.PRI-GSS-00)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","FGPART","headerfontbold", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","FGPART","caption","FG Part")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","FGPART","readonly", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","FGPART","allowedit", false)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","FGPART","MinWidth", 80)
+GUI.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","FGPART","CellForeColor", "Blue")
+
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Location","headerforecolor", v.Color.PRI-GSS-00)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Location","headerfontbold", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Location","caption","FG Location")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Location","readonly", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Location","allowedit", false)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Location","MinWidth", 80)
+GUI.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Location","CellForeColor", "Blue")
+
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","description","headerforecolor", v.Color.PRI-GSS-00)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","description","headerfontbold", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","description","caption","FG Description")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","description","readonly", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","description","allowedit", false)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","description","MinWidth", 120)
+
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Quantity","headerforecolor", v.Color.PRI-GSS-00)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Quantity","headerfontbold", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Quantity","caption","Qty")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Quantity","readonly", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Quantity","allowedit", false)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Quantity","MinWidth", 80)
+
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","DATE_DUE","headerforecolor", v.Color.PRI-GSS-00)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","DATE_DUE","headerfontbold", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","DATE_DUE","caption","Date Due")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","DATE_DUE","DisplayCustomDatetime", "d")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","DATE_DUE","readonly", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","DATE_DUE","allowedit", false)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","DATE_DUE","MinWidth", 80)
+
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","DATE_START","headerforecolor", v.Color.PRI-GSS-00)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","DATE_START","headerfontbold", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","DATE_START","caption","Start Date")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","DATE_START","DisplayCustomDatetime", "d")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","DATE_START","readonly", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","DATE_START","allowedit", false)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","DATE_START","MinWidth", 80)
+
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid", "DATE_OPENED", "headerforecolor", v.Color.PRI-GSS-00)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid", "DATE_OPENED", "headerfontbold", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid", "DATE_OPENED", "caption", "Date Created")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid", "DATE_OPENED", "DisplayCustomDatetime", "d")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid", "DATE_OPENED", "readonly", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid", "DATE_OPENED", "allowedit", false)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid", "DATE_OPENED", "MinWidth", 80)
+
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","WC","headerforecolor", v.Color.PRI-GSS-00)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","WC","headerfontbold", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","WC","caption","WC")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","WC","readonly", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","WC","allowedit", false)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","WC","MinWidth", 45)
+
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","CODE_SORT","headerforecolor", v.Color.PRI-GSS-00)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","CODE_SORT","headerfontbold", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","CODE_SORT","caption","Sort Code")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","CODE_SORT","readonly", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","CODE_SORT","allowedit", false)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","CODE_SORT","MinWidth", 80)
+
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","CUSTOMER","headerforecolor", v.Color.PRI-GSS-00)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","CUSTOMER","headerfontbold", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","CUSTOMER","caption","Customer ID")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","CUSTOMER","readonly", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","CUSTOMER","allowedit", false)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","CUSTOMER","MinWidth", 60)
+
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","NAME_CUSTOMER","headerforecolor", v.Color.PRI-GSS-00)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","NAME_CUSTOMER","headerfontbold", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","NAME_CUSTOMER","caption","Customer Name")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","NAME_CUSTOMER","readonly", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","NAME_CUSTOMER","allowedit", false)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","NAME_CUSTOMER","MinWidth", 120)
+
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","PRIORITY","headerforecolor", v.Color.PRI-GSS-00)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","PRIORITY","headerfontbold", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","PRIORITY","caption","Priority")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","PRIORITY","readonly", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","PRIORITY","allowedit", false)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","PRIORITY","MinWidth", 45)
+
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Department","headerforecolor", v.Color.PRI-GSS-00)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Department","headerfontbold", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Department","caption","Dept")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Department","readonly", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Department","allowedit", false)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","Department","MinWidth", 45)
+
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","sales_Order","headerforecolor", v.Color.PRI-GSS-00)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","sales_Order","headerfontbold", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","sales_Order","caption","SO HD")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","sales_Order","readonly", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","sales_Order","allowedit", false)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","sales_Order","MinWidth", 50)
+
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","CustPO","headerforecolor", v.Color.PRI-GSS-00)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","CustPO","headerfontbold", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","CustPO","caption","Cust. PO")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","CustPO","readonly", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","CustPO","allowedit", false)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","CustPO","MinWidth", 50)
+
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","sales_Order_line","headerforecolor", v.Color.PRI-GSS-00)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","sales_Order_line","headerfontbold", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","sales_Order_line","caption","SO LN")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","sales_Order_line","readonly", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","sales_Order_line","allowedit", false)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","sales_Order_line","MinWidth", 40)
+
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","JSS","Visible", False)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","JSS","headerforecolor", v.Color.PRI-GSS-00)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","JSS","headerfontbold", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","JSS","caption","JSS")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","JSS","readonly", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","JSS","allowedit", false)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","JSS","MinWidth", 60)
+
+GUI.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","DOCUMENT_CONTROL","headerforecolor", v.Color.PRI-GSS-00)
+GUI.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","DOCUMENT_CONTROL","headerfontbold", true)
+GUI.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","DOCUMENT_CONTROL","Caption", "Document Control")
+GUI.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","DOCUMENT_CONTROL","MinWidth", 40)
+GUI.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","DOCUMENT_CONTROL","readonly", true)
+GUI.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","DOCUMENT_CONTROL","allowedit", false)
+Gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","DOCUMENT_CONTROL","Icon","DCS-ON")
+
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","FLAG_WO_RELEASED","headerforecolor", v.Color.PRI-GSS-00)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","FLAG_WO_RELEASED","headerfontbold", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","FLAG_WO_RELEASED","caption","Released?")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","FLAG_WO_RELEASED","readonly", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","FLAG_WO_RELEASED","allowedit", false)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","FLAG_WO_RELEASED","MinWidth", 60)
+
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","HAS_BOM_FILE","headerforecolor", v.Color.PRI-GSS-00)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","HAS_BOM_FILE","headerfontbold", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","HAS_BOM_FILE","caption","Bom File?")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","HAS_BOM_FILE","readonly", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","HAS_BOM_FILE","allowedit", false)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","HAS_BOM_FILE","MinWidth", 60)
+
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","exported","headerforecolor", v.Color.PRI-GSS-00)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","exported","headerfontbold", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","exported","caption","XP?")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","exported","readonly", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","exported","allowedit", false)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","exported","MinWidth", 30)
+
+gui.FNestExport.GsGCJobs.AddStyleFormatCondition("JobsGrid","FLAG_WO_RELEASED", "Warntag", "equal", "Y")
+gui.FNestExport.GsGCJobs.setstyleFormatConditionproperty("JobsGrid","FLAG_WO_RELEASED", "Warntag", "backcolor", "LightCyan" )
+
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","BDATE","headerforecolor", v.Color.PRI-GSS-00)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","BDATE","headerfontbold", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","BDATE","caption","Schedule Date")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","BDATE","DisplayCustomDatetime", "d")
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","BDATE","readonly", true)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","BDATE","allowedit", false)
+gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","BDATE","MinWidth", 80)
+
+gui.FNestExport.GsGCJobs.SetGridviewProperty("JobsGrid","Enableappearanceoddrow",True)
+gui.FNestExport.GsGCJobs.SetGridviewProperty("JobsGrid","OptionsFindAlwaysVisible",False)
+gui.FNestExport.GsGCJobs.SetGridviewProperty("JobsGrid","Showgrouppanel",False)
+gui.FNestExport.GsGCJobs.SetGridviewProperty("JobsGrid","OptionsViewShowAutoFilterRow",True)
+
+gui.FNestExport.GsGCJobs.AddStyleFormatCondition("JobsGrid","Selected", "SelectTag", "equal", true)
+gui.FNestExport.GsGCJobs.setstyleFormatConditionproperty("JobsGrid","Selected", "SelectTag", "backcolor", "PaleGreen" )
+Gui.FNestExport.GsGCJobs.SetStyleFormatConditionProperty("JobsGrid", "Selected", "SelectTag", "ApplyToRow", True)
+
+gui.FNestExport.GsGCJobs.AddStyleFormatCondition("JobsGrid","exported", "XPTag", "equal", "Y")
+gui.FNestExport.GsGCJobs.setstyleFormatConditionproperty("JobsGrid","exported", "XPTag", "backcolor", "Red" )
+
+gui.FNestExport.GsGCJobs.AddStyleFormatCondition("JobsGrid","FLAG_WO_RELEASED", "Warntag", "equal", "Y")
+gui.FNestExport.GsGCJobs.setstyleFormatConditionproperty("JobsGrid","FLAG_WO_RELEASED", "Warntag", "backcolor", "LightCyan" )
+	
+gui.FNestExport.GsGCJobs.MainView("JobsGrid")
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("FormatJobGrid_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_SIGMANEST_EXPORT.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FNestExport_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.FormatJobGrid.End
+
+Program.Sub.EmptyJobData.Start
+F.Intrinsic.Control.SetErrorHandler("EmptyJobData_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+V.Local.i.Declare(Long,0)
+V.Local.sFields.Declare(String,"TransType*!*District*!*TransID*!*OrderNo*!*ItemName*!*Qty*!*Material*!*Thickness*!*DueDate*!*Customer*!*DwgNumber*!*Priority*!*ProgBy*!*Filename*!*Length*!*Width*!*Remark*!*RevNumber*!*Cost*!*HeatNumber*!*ItemType*!*OnHold*!*TypeDescr*!*BinNumber*!*Location*!*Mill*!*PrimeCode*!*ItemData1*!*ItemData2*!*ItemData3*!*ItemData4*!*OrderShape*!*ProgramName*!*ProgramRepeat*!*BatchFile*!*Process*!*StringData1*!*StringData2*!*StringData3*!*StringData4*!*StringData5*!*StringData6*!*StringData7*!*StringData8*!*Param1*!*Param2*!*Param3*!*Param4*!*Param5*!*Param6*!*Param7*!*Param8*!*IDNegTol*!*IDPosTol*!*ODNegTol*!*ODPosTol*!*ItemData5*!*ItemData6*!*ItemData7*!*ItemData8*!*ItemData9*!*ItemData10*!*ItemData11*!*ItemData12*!*ItemData13*!*ItemData14*!*ErrorTag*!*ItemID*!*PluginTag*!*ItemData15*!*ItemData16*!*ItemData17*!*ItemData18*!*SalesRep*!*DueDateFormula*!*TaxRate*!*StartDate*!*EndDate*!*TransPriority")
+
+f.Data.DataTable.Create("JobData",true)
+f.Data.DataTable.AddColumn("JobData","SELECTED","Boolean")
+f.Data.DataTable.AddColumn("JobData","EXPORTED","String")
+f.Data.DataTable.AddColumn("JobData","JOB","String")
+f.Data.DataTable.AddColumn("JobData","SUFFIX","String")
+f.Data.DataTable.AddColumn("JobData","SEQ","String")
+f.Data.DataTable.AddColumn("JobData","FGPART","String")
+F.Data.DataTable.AddColumn("JobData","Location","String")
+f.Data.DataTable.AddColumn("JobData","DESCRIPTION","String")
+f.Data.DataTable.AddColumn("JobData","Quantity","String")
+f.Data.DataTable.AddColumn("JobData","FLAG_WO_RELEASED","String")
+f.Data.DataTable.AddColumn("JobData","DATE_DUE","Date")
+f.Data.DataTable.AddColumn("JobData","DATE_START","Date")
+f.Data.DataTable.AddColumn("JobData","CUSTOMER","String")
+f.Data.DataTable.AddColumn("JobData","NAME_CUSTOMER","String")
+f.Data.DataTable.AddColumn("JobData","WC","String")
+f.Data.DataTable.AddColumn("JobData","CODE_SORT","String")
+f.Data.DataTable.AddColumn("JobData","PRIORITY","String")
+f.Data.DataTable.AddColumn("JobData","DEPARTMENT","String")
+f.Data.DataTable.AddColumn("JobData","SALES_ORDER","String")
+f.Data.DataTable.AddColumn("JobData","SALES_ORDER_LINE","String")
+f.Data.DataTable.AddColumn("JobData","JSS","String")
+f.Data.DataTable.AddColumn("JobData","CUSTPO","String")
+f.Data.DataTable.AddColumn("JobData","BDATE","Date")
+f.Data.DataTable.AddColumn("JobData","DATE_OPENED","Date")
+F.Data.DataTable.AddColumn("JobData", "DOCUMENT_CONTROL", "String", "")
+F.Data.DataTable.AddColumn("JobData", "HAS_BOM_FILE", "String", "")
+
+F.Data.DataTable.Create("Sigmanest",True)
+F.Intrinsic.String.Split(V.Local.sFields,"*!*",V.Local.sFields)
+F.Intrinsic.Control.For(V.Local.i,0,V.Local.sFields.UBound,1)
+	f.Data.DataTable.AddColumn("Sigmanest",V.Local.sFields(V.Local.i).Trim,"String")
+F.Intrinsic.Control.Next(V.Local.i)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("EmptyJobData_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_SIGMANEST_EXPORT.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FNestExport_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.EmptyJobData.End
+
+Program.Sub.cmdPopGrid_Click.Start
+F.Intrinsic.Control.SetErrorHandler("cmdPopGrid_Click_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+v.Local.sSql.Declare
+v.Local.sFilter.Declare
+v.Local.dFromDt.Declare
+v.Local.dToDt.Declare
+v.Local.bExists.Declare
+v.Local.sListVw.Declare
+v.Local.icount.Declare
+
+v.Local.dFromDt.Set(v.Screen.FNestExport!dtpFromDate.value)
+v.Local.dToDt.Set(v.Screen.FNestExport!dtpToDate.value)
+
+f.Intrinsic.Control.If(v.Local.dFromDt,>,v.Local.dToDt)
+	f.Intrinsic.UI.Msgbox("The from date cannot be greater than the to date")
+	gui.FNestExport..SetFocus
+	Gui.FNestExport..AlwaysOnTop(True)
+	Gui.FNestExport..AlwaysOnTop(False)
+	F.Intrinsic.Control.ExitSub
+f.Intrinsic.Control.EndIf
+
+gui.FNestExport..Enabled(false)
+
+f.Intrinsic.UI.InvokeWaitDialog("Loading Grid")
+
+F.Intrinsic.Control.If(V.DataTable.JobData.Exists)
+	F.Intrinsic.Control.If(V.Global.bLoadData.Not)
+		F.Intrinsic.Control.CallSub(Serialize, "FORM", "FNestExport", "GRIDCONTROL", "GsGCJobs", "GRIDVIEW", "JobsGrid", "REGID", 6364)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndIf
+
+GUI.FNestExport.GsGCJobs.Visible(False)
+F.Intrinsic.Control.If(V.Global.bLoadData)
+	F.Intrinsic.Control.CallSub(EmptyJobData)
+	f.Intrinsic.Control.CallSub(FormatJobGrid)
+F.Intrinsic.Control.Else
+	V.Global.bLoadData.Set(True)
+	F.Intrinsic.Control.CallSub(LoadData)
+F.Intrinsic.Control.EndIf
+
+V.Global.bLoadData.Set(False)
+
+F.Intrinsic.Control.CallSub(Deserialize, "FORM", "FNestExport", "GRIDCONTROL", "GsGCJobs", "GRIDVIEW", "JobsGrid", "REGID", 6364)
+
+f.Intrinsic.UI.CloseWaitDialog
+GUI.FNestExport.GsGCJobs.Visible(True)
+
+gui.FNestExport..SetFocus
+gui.FNestExport..Enabled(true)
+
+Gui.FNestExport..AlwaysOnTop(True)
+Gui.FNestExport..AlwaysOnTop(False)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("cmdPopGrid_Click_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_SIGMANEST_EXPORT.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FNestExport_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.cmdPopGrid_Click.End
+
+Program.Sub.LoadData.Start
+F.Intrinsic.Control.SetErrorHandler("LoadData_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+v.Local.sSql.Declare(String,"")
+v.Local.sFilter.Declare(String,"")
+v.Local.dFromDt.Declare(Date)
+v.Local.dToDt.Declare(Date)
+v.Local.bExists.Declare(Boolean,False)
+v.Local.sListVw.Declare(String,"")
+v.Local.iCount.Declare(Long,0)
+V.Local.sRet.Declare(String)
+V.Local.sWorkcenters.Declare(String,"")
+V.Local.sJSS.Declare(String,"")
+V.Local.sJS.Declare(String,"")
+V.Local.i.Declare(Long,0)
+V.Local.sExp.Declare(String,"")
+V.Local.sCad.Declare(String,"")
+V.Local.sCode.Declare(String,"")
+V.Local.sFGPart.Declare(String,"")
+V.Local.sDate.Declare(String,"")
+V.Local.sFiles.Declare(String,"")
+
+v.Local.dFromDt.Set(v.Screen.FNestExport!dtpFromDate.value)
+v.Local.dToDt.Set(v.Screen.FNestExport!dtpToDate.value)
+
+F.Intrinsic.Control.If(V.Global.sBomPath.Right1,=,"\")
+	F.Intrinsic.File.GetFileList(V.Global.sBomPath,V.Local.sFiles)
+F.Intrinsic.Control.Else
+	F.Intrinsic.String.Build("{0}\",V.Global.sBomPath,V.Global.sBomPath)
+	F.Intrinsic.File.GetFileList(V.Global.sBomPath,V.Local.sFiles)
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.String.Replace(V.Local.sFiles,".BOM","",V.Local.sFiles)
+
+F.Intrinsic.Control.If(V.DataTable.Bom.Exists)
+	F.Data.DataTable.Close("Bom")
+	F.Data.Dictionary.Close("BomFile")
+F.Intrinsic.Control.EndIf
+
+F.Data.DataTable.CreateFromString("Bom",V.Local.sFiles,"File","String",V.Ambient.NewLine,":")
+F.Data.DataTable.AddColumn("Bom","Bom_File",String,"Y")
+
+F.Data.Dictionary.CreateFromDataTable("BomFile","Bom","File","Bom_File",17)
+F.Data.Dictionary.SetDefaultReturn("BomFile","N")
+
+f.Intrinsic.Control.If(v.DataTable.JobData.Exists)
+	F.Data.DataTable.DeleteRow("JobData")
+	F.Data.DataTable.AcceptChanges("JobData")
+f.Intrinsic.Control.EndIf
+
+F.ODBC.Connection!Con.ExecuteAndReturn("select Machine from Workcenters where Nesting_Intrfc = 'Y'", V.Local.sWorkcenters)
+F.Intrinsic.String.Replace(V.Local.sWorkcenters, "#$#", "','", V.Local.sWorkcenters)
+
+'load APS data
+f.Intrinsic.Control.If(v.Screen.FNestExport!chkIncludeXP.CheckedAsBoolean)
+	f.Intrinsic.String.Build("Select distinct CAST(0 as bit) as SELECTED, B.Qty_Order as Quantity, B.Exported, A.Job, sfx as Suffix,Right(JSS,6) as seq, SAR as WC,ROG as Department, JSS, rtrim(Part) as FGPart, Location, FLAG_WO_RELEASED, Priority, Customer, Date_Due, Date_Start as Date_Start, Description, Date_Opened, IF(Sales_Order = '0000000','',Sales_Order) as Sales_Order, IF(Sales_Order_Line = '000','',Sales_Order_Line) as Sales_Order_Line from APSV3_UBDETAIL A Left Join V_Job_Header B on A.Job = B.Job and A.Sfx = B.Suffix where SEQ < '995000' and SAR in ('{0}') and bdate >= '{1}' and bdate <= '{2}' ", V.Local.sWorkcenters, v.Local.dFromDt.PervasiveDate,v.Local.dToDt.PervasiveDate,v.Local.sSQL)
+f.Intrinsic.Control.Else
+	f.Intrinsic.String.Build("Select distinct CAST(0 as bit) as SELECTED, B.Qty_Order as Quantity, B.Exported, A.Job, sfx as Suffix,Right(JSS,6) as seq, SAR as WC,ROG as Department, JSS, rtrim(Part) as FGPart, Location, FLAG_WO_RELEASED, Priority, Customer, Date_Due, Date_Start as Date_Start, Description, Date_Opened, IF(Sales_Order = '0000000','',Sales_Order) as Sales_Order, IF(Sales_Order_Line = '000','',Sales_Order_Line) as Sales_Order_Line from APSV3_UBDETAIL A Left Join V_Job_Header B on A.Job = B.Job and A.Sfx = B.Suffix where SEQ < '995000' and SAR in ('{0}') and bdate >= '{1}' and bdate <= '{2}'  and Exported <> 'Y'",  V.Local.sWorkcenters, v.Local.dFromDt.PervasiveDate, v.Local.dToDt.PervasiveDate,v.Local.sSQL)
+f.Intrinsic.Control.EndIf
+
+f.data.DataTable.CreateFromSQL("JobDataTemp","Con",v.Local.sSQL, True)
+F.Data.DataTable.AddColumn("JobDataTemp","Units",Float)
+F.Data.DataTable.AddColumn("JobDataTemp","BDATE",Date)
+F.Data.DataTable.AddColumn("JobDataTemp","CODE_SORT",String)
+F.Data.DataTable.AddColumn("JobDataTemp","HAS_BOM_FILE",String)
+
+F.Data.Dictionary.CreateFromSQL("Units","con","select Job+if(suffix is null,'   ',Suffix)+Seq,Units_Open from V_Job_Operations")
+F.Data.Dictionary.SetDefaultReturn("Units","0")
+
+F.Data.DataTable.FillFromDictionary("JobDataTemp","Units","Jss","Units")
+F.Data.Dictionary.Close("Units")
+
+F.Data.Dictionary.CreateFromSQL("DStart","con","select Job+if(suffix is null,'   ',Suffix)+Seq,Date_Start from V_Job_Operations")
+F.Data.Dictionary.SetDefaultReturn("DStart","01/01/1900")
+
+F.Data.DataTable.FillFromDictionary("JobDataTemp","DStart","Jss","Date_Start")
+F.Data.Dictionary.Close("DStart")
+
+F.Data.Dictionary.CreateFromSQL("CS","con","Select rtrim(Part), Code_Sort From V_Inventory_Mstr")
+F.Data.Dictionary.SetDefaultReturn("CS"," ")
+
+F.Data.DataTable.FillFromDictionary("JobDataTemp","CS","FGPart","Code_Sort")
+F.Data.Dictionary.Close("CS")
+
+F.Data.DataTable.FillFromDictionary("JobDataTemp","BomFile","FGPart","HAS_BOM_FILE")
+F.Data.Dictionary.Close("BomFile")
+
+F.Intrinsic.Control.For(V.Local.i,0,V.DataTable.JobDataTemp.RowCount--,1)
+	F.Intrinsic.String.Build("Select Top 1 b.BDate from APSV3_UBDETAIL b Where b.Jss = '{0}' Order by b.BNo Desc",V.DataTable.JobDataTemp(V.Local.i).JSS!FieldValTrim,V.Local.sSql)
+	F.ODBC.Connection!con.ExecuteAndReturn(V.Local.sSql,V.Local.sDate)
+	F.Intrinsic.Control.If(V.Local.sDate,=,"")
+		V.Local.sDate.Set("01/01/1900")
+	F.Intrinsic.Control.EndIf
+	F.Data.DataTable.SetValue("JobDataTemp",V.Local.i,"BDate",V.Local.sDate)
+F.Intrinsic.Control.Next(V.Local.i)
+
+F.Data.DataTable.Merge("JobDataTemp","JobData",False,2)
+
+F.Data.DataTable.Close("JobDataTemp")
+
+'filling in customer name
+F.Data.Dictionary.CreateFromSQL("Cust","con","Select Customer, Name_Customer From V_Customer_Master")
+F.Data.Dictionary.SetDefaultReturn("Cust"," ")
+F.Data.DataTable.FillFromDictionary("JobData","Cust","Customer","Name_Customer")
+F.Data.Dictionary.Close("Cust")
+'filling in customer po
+F.Data.Dictionary.CreateFromSQL("CPO","con","Select Order_No as sales_Order, Customer_PO as CustPO From V_Order_Header")
+F.Data.Dictionary.SetDefaultReturn("CPO"," ")
+F.Data.DataTable.FillFromDictionary("JobData","CPO","sales_Order","CustPO")
+F.Data.Dictionary.Close("CPO")
+
+Gui.FNestExport.GsGCJobs.SetColumnProperty("JobsGrid","DOCUMENT_CONTROL","Icon","DCS-ON")
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("LoadData_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_SIGMANEST_EXPORT.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FNestExport_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.LoadData.End
+
+Program.Sub.cmdXP_Click.Start
+F.Intrinsic.Control.SetErrorHandler("cmdXP_Click_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+V.Local.sSql.Declare(String,"")
+V.Local.i.Declare(Long,0)
+V.Local.sSeq.Declare(String,"")
+V.Local.sOrder.Declare(String,"")
+V.Local.sSuffix.Declare(String,"")
+V.Local.sData.Declare(String,"")
+'V.Local.sFields.Declare(String,"TransType*!*District*!*TransID*!*OrderNo*!*ItemName*!*Qty*!*Material*!*Thickness*!*DueDate*!*Customer*!*DwgNumber*!*Priority*!*ProgBy*!*Filename*!*Length*!*Width*!*Remark*!*RevNumber*!*Cost*!*HeatNumber*!*ItemType*!*OnHold*!*TypeDescr*!*BinNumber*!*Location*!*Mill*!*PrimeCode*!*ItemData1*!*ItemData2*!*ItemData3*!*ItemData4*!*OrderShape*!*ProgramName*!*ProgramRepeat*!*BatchFile*!*Process*!*StringData1*!*StringData2*!*StringData3*!*StringData4*!*StringData5*!*StringData6*!*StringData7*!*StringData8*!*Param1*!*Param2*!*Param3*!*Param4*!*Param5*!*Param6*!*Param7*!*Param8*!*IDNegTol*!*IDPosTol*!*ODNegTol*!*ODPosTol*!*ItemData5*!*ItemData6*!*ItemData7*!*ItemData8*!*ItemData9*!*ItemData10*!*ItemData11*!*ItemData12*!*ItemData13*!*ItemData14*!*ErrorTag*!*ItemID*!*PluginTag*!*ItemData15*!*ItemData16*!*ItemData17*!*ItemData18*!*SalesRep*!*DueDateFormula*!*TaxRate*!*StartDate*!*EndDate*!*TransPriority")
+V.Local.sFields.Declare(String,"TransType*!*District*!*TransID*!*OrderNo*!*ItemName*!*Qty*!*Material*!*Thickness*!*DueDate*!*Customer*!*DwgNumber*!*Priority*!*ProgBy*!*Filename")
+V.Local.sFileName.Declare(String,"")
+V.Local.sDate.Declare(String,"")
+V.Local.sTime.Declare(String,"")
+V.Local.sItemName.Declare(String,"")
+V.Local.sItemRev.Declare(String,"")
+V.Local.sBOMFile.Declare(String,"")
+
+F.Intrinsic.String.Format(V.Ambient.Date,"MMDDYY",V.Local.sDate)
+F.Intrinsic.String.Format(V.Ambient.Time,"hHnNsS",V.Local.sTime)
+F.Intrinsic.String.Build("{0}-{1}",V.Local.sDate,V.Local.sTime,V.Local.sDate)
+
+F.Intrinsic.Control.If(V.Global.sInputPath.Right1,=,"\")
+	F.Intrinsic.String.Build("{0}SigmaNest{1}.csv",V.Global.sInputPath,V.Local.sDate,V.Local.sFileName)
+F.Intrinsic.Control.Else
+	F.Intrinsic.String.Build("{0}\SigmaNest{1}.csv",V.Global.sInputPath,V.Local.sDate,V.Local.sFileName)
+F.Intrinsic.Control.EndIf
+
+gui.FNestExport..Enabled(false)
+
+F.Data.DataView.Create("JobData","VJobData",22,"Selected = True","")
+
+F.ODBC.Connection!ConM.OpenCompanyConnection
+F.Intrinsic.Control.If(V.DataView.JobData!VJobData.RowCount--,<>,-1)
+	'Getting Materials for Selected Eported JSS
+	F.Intrinsic.Control.For(V.Local.i,0,V.DataView.JobData!VJobData.RowCount--,1)
+		F.Intrinsic.String.LPad(V.DataView.JobData!VJobData(V.Local.i).Seq!FieldValTrim,"0",6,V.Local.sSeq)
+		F.Intrinsic.String.LPad(V.DataView.JobData!VJobData(V.Local.i).Suffix!FieldValTrim," ",3,V.Local.sSuffix)
+		F.Intrinsic.String.Build("{0}-{1}-{2}",V.DataView.JobData!VJobData(V.Local.i).Job!FieldValTrim,V.Local.sSuffix,V.Local.sSeq,V.Local.sOrder)
+		F.Intrinsic.String.RPad(V.DataView.JobData!VJobData(V.Local.i).FGPart!FieldValTrim," ",20,V.Local.sItemName)
+		F.Intrinsic.String.Right(V.Local.sItemName,3,V.Local.sItemRev)
+		F.Intrinsic.String.Left(V.Local.sItemName,17,V.Local.sItemName)
+		F.Intrinsic.String.Build("{0}{1}.BOM",V.Global.sBomPath,V.Local.sItemName.Trim,V.Local.sBOMFile)
+		F.Data.DataTable.AddRow("Sigmanest","TransType","SN86","District","1","OrderNO",V.Local.sOrder,"Material","","ItemName","","Thickness","","DueDate",V.DataView.JobData!VJobData(V.Local.i).Date_Due!FieldValTrim,"RevNumber","")
+		F.Data.DataTable.SetValue("Sigmanest",V.DataTable.Sigmanest.RowCount--,"Qty",V.DataView.JobData!VJobData(V.Local.i).Quantity!FieldValFloat,"Customer",V.DataView.JobData!VJobData(V.Local.i).Name_Customer!FieldValTrim,"Priority",V.DataView.JobData!VJobData(V.Local.i).Priority!FieldValTrim,"Filename",V.Local.sBOMFile)
+
+	F.Intrinsic.Control.Next(V.Local.i)
+F.Intrinsic.Control.EndIf
+
+F.ODBC.Connection!ConM.Close
+
+'creating file for sigmanest export
+F.Intrinsic.Control.If(V.DataTable.Sigmanest.RowCount--,<>,-1)
+	F.Data.DataView.Create("Sigmanest","VSigmanNest",22,"","")
+	F.Data.DataView.ToString("Sigmanest","VSigmanNest",V.Local.sFields,",",V.Ambient.NewLine,V.Local.sData)
+	F.data.DataView.Close("Sigmanest","VSigmanNest")
+	F.Intrinsic.String.Replace(V.Local.sFields,"*!*",",",V.Local.sFields)
+	F.Intrinsic.String.Build("{0}{1}{2}",V.Local.sFields,V.Ambient.NewLine,V.Local.sData,V.Local.sData)
+	F.Intrinsic.File.String2File(V.Local.sFileName,V.Local.sData)
+	F.Intrinsic.Control.CallSub(UpdateXP)
+F.Intrinsic.Control.EndIf
+
+'Marking Jobs as exported
+F.Intrinsic.Control.For(V.Local.i,V.DataView.JobData!VJobData.RowCount--,0,-1)
+	F.Data.DataView.SetValue("JobData","VJobData",-1,"exported","Y")
+F.Intrinsic.Control.Next(V.Local.i)
+
+F.Data.DataTable.AcceptChanges("JobData")
+	
+F.Data.DataTable.DeleteRow("Sigmanest")
+F.Data.DataTable.AcceptChanges("Sigmanest")
+
+F.Data.DataView.Close("JobData","VJobData")
+
+gui.FNestExport..Enabled(true)
+gui.FNestExport..SetFocus
+Gui.FNestExport..AlwaysOnTop(True)
+Gui.FNestExport..AlwaysOnTop(False)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("cmdXP_Click_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_SIGMANEST_EXPORT.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FNestExport_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.cmdXP_Click.End
+
+Program.Sub.FNestExport_UnLoad.Start
+F.Intrinsic.Control.SetErrorHandler("FNestExport_UnLoad_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+
+F.Intrinsic.Control.If(V.DataTable.JobData.Exists)
+	F.Intrinsic.Control.If(V.Global.bLoadData.Not)
+		F.Intrinsic.Control.CallSub(Serialize, "FORM", "FNestExport", "GRIDCONTROL", "GsGCJobs", "GRIDVIEW", "JobsGrid", "REGID", 6364)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.CallSub("CloseSettingsDT")
+F.Intrinsic.Control.CallSub(Connection, "CONNECT", False)
+''F.Intrinsic.Control.CallSub(ScriptPIDClear, "PROJECT", "6364", "TASK", "GCG_6364_NEST_XP")
+f.Intrinsic.Control.End
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("FNestExport_UnLoad_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	f.Intrinsic.Control.End
+Function.Intrinsic.Control.EndIf
+Program.Sub.FNestExport_UnLoad.End
+
+Program.Sub.ContextMenuItemSelection.Start
+F.Intrinsic.Control.SetErrorHandler("ContextMenuItemSelection_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+V.Local.sJobs.Declare(String)
+V.Local.sMessage.Declare(String)
+V.Local.iRet.Declare(Long)
+
+f.Intrinsic.Control.If(v.Args.ItemName,=,"SELECTF")
+	F.Intrinsic.Control.CallSub(GridViewFilterToDataViewFilter, "FILTER", V.Global.sFilter)
+	f.Data.DataView.Create("JobData","SetVw",22,V.Args.Filter,"")
+	f.Data.DataView.SetValue("JobData","SetVw",-1,"Selected",True)
+	f.Data.DataView.Close("JobData","SetVw")
+f.Intrinsic.Control.ElseIf(v.Args.ItemName,=,"USELECTF")
+	F.Intrinsic.Control.CallSub(GridViewFilterToDataViewFilter, "FILTER", V.Global.sFilter)
+	f.Data.DataView.Create("JobData","SetVw",22,V.Args.Filter,"")
+	f.Data.DataView.SetValue("JobData","SetVw",-1,"Selected",False)
+	f.Data.DataView.Close("JobData","SetVw")
+f.Intrinsic.Control.ElseIf(v.Args.ItemName,=,"SELECT")
+	f.Data.DataView.SetValue("JobData","JobDataVw",-1,"Selected",True)
+
+f.Intrinsic.Control.ElseIf(v.Args.ItemName,=,"USELECT")
+	f.Data.DataView.SetValue("JobData","JobDataVw",-1,"Selected",False)
+	
+f.Intrinsic.Control.ElseIf(v.Args.ItemName,=,"UFLAGEXP")
+	f.Data.DataView.Create("JobData","SetVw",22,"Selected = True","")
+
+	F.Intrinsic.Control.If(V.DataView.JobData!SetVw.RowCount, >, 0)
+	
+		F.Intrinsic.Control.If(V.DataView.JobData!SetVw.RowCount, =, 1)
+			V.Local.sMessage.Set("Are you sure you want to remove the exported flag on this 1 job?")
+		F.Intrinsic.Control.Else
+			F.Intrinsic.String.Build("Are you sure you want to remove the exported flag on these {0} jobs?", V.DataView.JobData!SetVw.RowCount, V.Local.sMessage)
+		F.Intrinsic.Control.EndIf
+		
+		F.Intrinsic.UI.Msgbox(V.Local.sMessage, "Unflag", 4, V.Local.iRet)
+		F.Intrinsic.Control.If(V.Local.iRet, =, V.Ambient.MsgBoxYes)
+			f.Data.DataView.SetValue("JobData","SetVw",-1,"Exported","")
+
+			F.Data.DataView.ToDataTable("JobData", "SetVw", "dtUnexported")
+			f.Data.DataTable.SaveToDB("dtUnexported","Con", "JOB_HEADER", "Job*!*Suffix", 256, "Job@!@job*!*suffix@!@suffix*!*exported@!@exported")
+			F.Data.DataTable.Close("dtUnexported")
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.EndIf
+	
+	f.Data.DataView.Close("JobData","SetVw")
+f.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("ContextMenuItemSelection_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber, =, 21058)
+		F.Intrinsic.UI.Msgbox("This type of filter cannot be used for select filtered rows. Please use a different filter or select the rows manually.")
+F.Intrinsic.Control.Else
+	F.Intrinsic.String.Build("Project: GCG_6364_SIGMANEST_EXPORT.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FNestExport_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.ContextMenuItemSelection.End
+
+Program.Sub.GridViewFilterToDataViewFilter.Start
+'this sub is for converting the active filter string of a gridview into a dataview friendly version
+'FILTER	-	The Active Filter String
+
+'valid operators: =, >, <, >=, <=, <>, in, is null, not, like
+
+F.Intrinsic.Control.SetErrorHandler("GridViewFilterToDataViewFilter_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+
+V.Local.sFilter.Declare(String)
+V.Local.sRet.Declare(String)
+V.Local.iCounter.Declare(Long)
+V.Local.sFields.Declare(String)
+V.Local.sTemp.Declare(String)
+V.Local.sTemp2.Declare(String)
+V.Local.sFindString.Declare(String)
+V.Local.sReplaceString.Declare(String)
+V.Local.sValues.Declare(String)
+V.Local.sValueReturn.Declare(String)
+V.Local.sFieldReturn.Declare(String)
+V.Local.sValueRegEx.Declare(String, "\'[^']*\'")
+V.Local.sFieldRegEx.Declare(String, "\[[A-Za-z0-9_-]+\]")
+V.Local.sNumberRegEx.Declare(String, "-?[0-9]+(\.[0-9]+)?")
+V.Local.sRegEx.Declare(String)
+V.Local.sMatch.Declare(String)
+V.Local.ilength.Declare(Long)
+V.Local.sValueReturn2.Declare(String)
+
+V.Local.sFilter.Set(V.Args.Filter)
+
+'fix all IsNullOrEmpty
+F.Intrinsic.String.Build("IsNullOrEmpty\({0}\)", V.Local.sFieldRegEx, V.Local.sRegEx)
+F.Intrinsic.String.RegExMatch(V.Local.sFilter, V.Local.sRegEx, True, V.Local.sRet)
+F.Intrinsic.Control.If(V.Local.sRet.Trim, !=, "")
+	F.Intrinsic.String.Split(V.Local.sRet, "@!@", V.Local.sRet)
+	F.Intrinsic.Control.For(V.Local.iCounter, 0, V.Local.sRet.UBound, 1)
+		
+		'get match
+		F.Intrinsic.String.Split(V.Local.sRet(V.Local.iCounter), "*!*", V.Local.sTemp)
+		V.Local.sMatch.Set(V.Local.sTemp(1))
+		
+		'get the field, only one
+		F.Intrinsic.String.RegExMatch(V.Local.sMatch, V.Local.sFieldRegEx, True, V.Local.sTemp)
+		F.Intrinsic.String.Split(V.Local.sTemp, "*!*", V.Local.sTemp)
+		V.Local.sFieldReturn.Set(V.Local.sTemp(1))
+		
+		'Replace
+		F.Intrinsic.String.Build("({0} is Null or {0} = '')", V.Local.sFieldReturn, V.Local.sReplaceString)
+		F.Intrinsic.String.Replace(V.Local.sFilter, V.Local.sMatch, V.Local.sReplaceString, V.Local.sFilter)
+	F.Intrinsic.Control.Next(V.Local.iCounter)
+F.Intrinsic.Control.EndIf
+
+'fix all StartsWith
+F.Intrinsic.String.Build("StartsWith\({0},\s*{1}\)", V.Local.sFieldRegEx, V.Local.sValueRegEx, V.Local.sRegEx)
+F.Intrinsic.String.RegExMatch(V.Local.sFilter, V.Local.sRegEx, True, V.Local.sRet)
+F.Intrinsic.Control.If(V.Local.sRet.Trim, !=, "")
+	F.Intrinsic.String.Split(V.Local.sRet, "@!@", V.Local.sRet)
+	F.Intrinsic.Control.For(V.Local.iCounter, 0, V.Local.sRet.UBound, 1)
+		
+		'get match
+		F.Intrinsic.String.Split(V.Local.sRet(V.Local.iCounter), "*!*", V.Local.sTemp)
+		V.Local.sMatch.Set(V.Local.sTemp(1))
+		
+		'get the field, only one
+		F.Intrinsic.String.RegExMatch(V.Local.sMatch, V.Local.sFieldRegEx, True, V.Local.sTemp)
+		F.Intrinsic.String.Split(V.Local.sTemp, "*!*", V.Local.sTemp)
+		V.Local.sFieldReturn.Set(V.Local.sTemp(1))
+		
+		'get the value, only one
+		F.Intrinsic.String.RegExMatch(V.Local.sMatch, V.Local.sValueRegEx, True, V.Local.sTemp)
+		F.Intrinsic.String.Split(V.Local.sTemp, "*!*", V.Local.sTemp)
+		V.Local.sValueReturn.Set(V.Local.sTemp(1))
+		F.Intrinsic.String.TrimChar(V.Local.sValueReturn, "'", V.Local.sValueReturn)
+		
+		'Replace
+		F.Intrinsic.String.Build("{0} like '{1}%'", V.Local.sFieldReturn, V.Local.sValueReturn, V.Local.sReplaceString)
+		F.Intrinsic.String.Replace(V.Local.sFilter, V.Local.sMatch, V.Local.sReplaceString, V.Local.sFilter)
+	F.Intrinsic.Control.Next(V.Local.iCounter)
+F.Intrinsic.Control.EndIf
+
+'fix all EndsWith
+F.Intrinsic.String.Build("EndsWith\({0},\s*{1}\)", V.Local.sFieldRegEx, V.Local.sValueRegEx, V.Local.sRegEx)
+F.Intrinsic.String.RegExMatch(V.Local.sFilter, V.Local.sRegEx, True, V.Local.sRet)
+F.Intrinsic.Control.If(V.Local.sRet.Trim, !=, "")
+	F.Intrinsic.String.Split(V.Local.sRet, "@!@", V.Local.sRet)
+	F.Intrinsic.Control.For(V.Local.iCounter, 0, V.Local.sRet.UBound, 1)
+		
+		'get match
+		F.Intrinsic.String.Split(V.Local.sRet(V.Local.iCounter), "*!*", V.Local.sTemp)
+		V.Local.sMatch.Set(V.Local.sTemp(1))
+		
+		'get the field, only one
+		F.Intrinsic.String.RegExMatch(V.Local.sMatch, V.Local.sFieldRegEx, True, V.Local.sTemp)
+		F.Intrinsic.String.Split(V.Local.sTemp, "*!*", V.Local.sTemp)
+		V.Local.sFieldReturn.Set(V.Local.sTemp(1))
+		
+		'get the value, only one
+		F.Intrinsic.String.RegExMatch(V.Local.sMatch, V.Local.sValueRegEx, True, V.Local.sTemp)
+		F.Intrinsic.String.Split(V.Local.sTemp, "*!*", V.Local.sTemp)
+		V.Local.sValueReturn.Set(V.Local.sTemp(1))
+		F.Intrinsic.String.TrimChar(V.Local.sValueReturn, "'", V.Local.sValueReturn)
+		
+		'Replace
+		F.Intrinsic.String.Build("{0} like '%{1}'", V.Local.sFieldReturn, V.Local.sValueReturn, V.Local.sReplaceString)
+		F.Intrinsic.String.Replace(V.Local.sFilter, V.Local.sMatch, V.Local.sReplaceString, V.Local.sFilter)
+	F.Intrinsic.Control.Next(V.Local.iCounter)
+F.Intrinsic.Control.EndIf
+
+'fix all Contains
+F.Intrinsic.String.Build("Contains\({0},\s*{1}\)", V.Local.sFieldRegEx, V.Local.sValueRegEx, V.Local.sRegEx)
+F.Intrinsic.String.RegExMatch(V.Local.sFilter, V.Local.sRegEx, True, V.Local.sRet)
+F.Intrinsic.Control.If(V.Local.sRet.Trim, !=, "")
+	F.Intrinsic.String.Split(V.Local.sRet, "@!@", V.Local.sRet)
+	F.Intrinsic.Control.For(V.Local.iCounter, 0, V.Local.sRet.UBound, 1)
+		
+		'get match
+		F.Intrinsic.String.Split(V.Local.sRet(V.Local.iCounter), "*!*", V.Local.sTemp)
+		V.Local.sMatch.Set(V.Local.sTemp(1))
+		
+		'get the field, only one
+		F.Intrinsic.String.RegExMatch(V.Local.sMatch, V.Local.sFieldRegEx, True, V.Local.sTemp)
+		F.Intrinsic.String.Split(V.Local.sTemp, "*!*", V.Local.sTemp)
+		V.Local.sFieldReturn.Set(V.Local.sTemp(1))
+		
+		'get the value, only one
+		F.Intrinsic.String.RegExMatch(V.Local.sMatch, V.Local.sValueRegEx, True, V.Local.sTemp)
+		F.Intrinsic.String.Split(V.Local.sTemp, "*!*", V.Local.sTemp)
+		V.Local.sValueReturn.Set(V.Local.sTemp(1))
+		F.Intrinsic.String.TrimChar(V.Local.sValueReturn, "'", V.Local.sValueReturn)
+		
+		'Replace
+		F.Intrinsic.String.Build("{0} like '%{1}%'", V.Local.sFieldReturn, V.Local.sValueReturn, V.Local.sReplaceString)
+		F.Intrinsic.String.Replace(V.Local.sFilter, V.Local.sMatch, V.Local.sReplaceString, V.Local.sFilter)
+	F.Intrinsic.Control.Next(V.Local.iCounter)
+F.Intrinsic.Control.EndIf
+
+'fix between
+F.Intrinsic.String.Build("{0} Between\({1}m?, {1}m?\)", V.Local.sFieldRegEx, V.Local.sNumberRegEx, V.Local.sRegEx)
+F.Intrinsic.String.RegExMatch(V.Local.sFilter, V.Local.sRegEx, True, V.Local.sRet)
+F.Intrinsic.Control.If(V.Local.sRet.Trim, !=, "")
+	F.Intrinsic.String.Split(V.Local.sRet, "@!@", V.Local.sRet)
+	F.Intrinsic.Control.For(V.Local.iCounter, 0, V.Local.sRet.UBound, 1)
+		
+		'get match
+		F.Intrinsic.String.Split(V.Local.sRet(V.Local.iCounter), "*!*", V.Local.sTemp)
+		V.Local.sMatch.Set(V.Local.sTemp(1))
+		
+		'get the field, only one
+		F.Intrinsic.String.RegExMatch(V.Local.sMatch, V.Local.sFieldRegEx, True, V.Local.sTemp)
+		F.Intrinsic.String.Split(V.Local.sTemp, "*!*", V.Local.sTemp)
+		V.Local.sFieldReturn.Set(V.Local.sTemp(1))
+		
+		'get the values, two
+		F.Intrinsic.String.RegExMatch(V.Local.sMatch, V.Local.sNumberRegEx, True, V.Local.sTemp)
+		F.Intrinsic.String.Split(V.Local.sTemp, "@!@", V.Local.sTemp)
+		F.Intrinsic.String.Split(V.Local.sTemp(0), "*!*", V.Local.sTemp2)
+		V.Local.sValueReturn.Set(V.Local.sTemp2(1))
+		F.Intrinsic.String.Split(V.Local.sTemp(1), "*!*", V.Local.sTemp2)
+		V.Local.sValueReturn2.Set(V.Local.sTemp2(1))
+		
+		'Replace
+		F.Intrinsic.String.Build("({0} >= {1} and {0} <= {2})", V.Local.sFieldReturn, V.Local.sValueReturn, V.Local.sValueReturn2, V.Local.sReplaceString)
+		F.Intrinsic.String.Replace(V.Local.sFilter, V.Local.sMatch, V.Local.sReplaceString, V.Local.sFilter)
+	F.Intrinsic.Control.Next(V.Local.iCounter)
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Variable.AddRV("FILTER", V.Local.sFilter)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("GridViewFilterToDataViewFilter_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_SIGMANEST_EXPORT.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FNestExport_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.GridViewFilterToDataViewFilter.End
+
+Program.Sub.GsGCJobs_ColumnFilterChanged.Start
+F.Intrinsic.Control.SetErrorHandler("GsGCJobs_ColumnFilterChanged_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+
+v.Global.sFilter.Set(v.Args.ActiveFilterExpression)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("GsGCJobs_ColumnFilterChanged_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_SIGMANEST_EXPORT.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FNestExport_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.GsGCJobs_ColumnFilterChanged.End
+
+Program.Sub.LoadContextMenu.Start
+F.Intrinsic.Control.SetErrorHandler("LoadContextMenu_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+
+Gui.FNestExport..ContextMenuCreate("JobsGrid")
+Gui.FNestExport..ContextMenuAddItem("JobsGrid","SELECTF",0,"Select Filtered Rows")
+Gui.FNestExport..ContextMenuAddItem("JobsGrid","USELECTF",0,"Deselect Filtered Rows")
+Gui.FNestExport..ContextMenuAddItem("JobsGrid","SELECT",0,"Select All Rows")
+Gui.FNestExport..ContextMenuAddItem("JobsGrid","USELECT",0,"Deselect All Rows")
+Gui.FNestExport..ContextMenuAddItem("JobsGrid","UFLAGEXP",0,"Unflag Exported Flag")
+Gui.FNestExport..ContextMenuSetItemEventHandler("JobsGrid","SelectF","ContextMenuItemSelection")
+Gui.FNestExport..ContextMenuSetItemEventHandler("JobsGrid","USelectF","ContextMenuItemSelection")
+Gui.FNestExport..ContextMenuSetItemEventHandler("JobsGrid","Select","ContextMenuItemSelection")
+Gui.FNestExport..ContextMenuSetItemEventHandler("JobsGrid","USelect","ContextMenuItemSelection")
+Gui.FNestExport..ContextMenuSetItemEventHandler("JobsGrid","UFLAGEXP","ContextMenuItemSelection")
+GUI.FNestExport.GsGCJobs.ContextMenuAttach("JobsGrid")
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("LoadContextMenu_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_SIGMANEST_EXPORT.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FNestExport_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.LoadContextMenu.End
+
+Program.Sub.PreFolderCheck.Start
+F.Intrinsic.Control.SetErrorHandler("PreFolderCheck_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+v.Local.sFilePath.Declare(String,"")
+v.Local.sCustom.Declare(String,"")
+v.Local.bExists.Declare(Boolean,False)
+v.Local.sBCFile.Declare(String,"")
+V.Local.sSql.Declare(String,"")
+
+F.Intrinsic.String.Build("Select Input_Dir From GCG_6364_Sigma_Dir Where Company = '{0}'",V.Caller.CompanyCode,V.Local.sSql)
+F.ODBC.Connection!Con.ExecuteAndReturn(V.Local.sSql,V.Global.sInputPath)
+
+F.Intrinsic.Control.If(V.Global.sInputPath.Trim,=,"")
+	F.Intrinsic.UI.Msgbox("Go to Menu Item: Shop Floor Control > File > SigmaNest Integration Directories (6364) to set up a Input Directory.","Attention")
+	F.Intrinsic.Control.CallSub(FNestExport_UnLoad)
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.String.Build("Select Bom_Dir From GCG_6364_Sigma_Dir Where Company = '{0}'",V.Caller.CompanyCode,V.Local.sSql)
+F.ODBC.Connection!Con.ExecuteAndReturn(V.Local.sSql,V.Global.sBomPath)
+
+F.Intrinsic.Control.If(V.Global.sBomPath.Trim,=,"")
+	F.Intrinsic.UI.Msgbox("Go to Menu Item: Shop Floor Control > File > SigmaNest Integration Directories (6364) to set up a Bom Directory.","Attention")
+	F.Intrinsic.Control.CallSub(FNestExport_UnLoad)
+F.Intrinsic.Control.EndIf
+
+f.Intrinsic.string.Build("{0}\CUSTOM\6364\{1}\EXPORT_INTERFACE",v.Caller.GlobalDir, V.Caller.CompanyCode, v.Local.sFilePath)
+f.Intrinsic.File.DirExists(v.Local.sFilePath,v.Local.bExists)
+f.Intrinsic.Control.If(v.local.bExists,=,false)
+	f.Intrinsic.File.CreateDir(v.Local.sFilePath)
+f.Intrinsic.Control.EndIf
+
+f.Intrinsic.string.Build("{0}\CUSTOM\6364\{2}\EXPORT_INTERFACE\GCG_6364_BCWODET_PRINT_{1}.dat",v.Caller.GlobalDir, v.Caller.Terminal, V.Caller.CompanyCode, v.Global.sBarCodePath)
+
+f.Intrinsic.File.Exists(v.Global.sBarCodePath,v.Local.bExists)
+f.Intrinsic.Control.If(v.Local.bExists)
+	gui.FNestExport.chkPrintBCWODetail.Value(1)
+f.Intrinsic.Control.Else
+	gui.FNestExport.chkPrintBCWODetail.Value(0)
+f.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("PreFolderCheck_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_SIGMANEST_EXPORT.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FNestExport_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.PreFolderCheck.End
+
+Program.Sub.UpdateXP.Start
+F.Intrinsic.Control.SetErrorHandler("UpdateXP_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+V.Local.i.Declare(Long,0)
+V.Local.sSeq.Declare(String,"")
+
+
+F.Data.DataView.ToDataTable("JobData","VJobData","WOSOINV",True)
+
+f.Data.DataTable.SetValue("WOSOINV",-1,"EXPORTED","Y")
+
+f.Data.DataTable.SaveToDB("WOSOINV","Con", "JOB_HEADER", "Job*!*Suffix", 256, "Job@!@job*!*suffix@!@suffix*!*exported@!@exported")
+
+F.Intrinsic.Control.If(V.Screen.FNestExport!chkPrintBCWODetail.Value,=,1)
+	F.Intrinsic.Control.CallSub(PrintBarCodeWODet)
+F.Intrinsic.Control.EndIf
+
+F.Data.DataTable.Close("WOSOINV")
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("UpdateXP_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_SIGMANEST_EXPORT.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FNestExport_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.UpdateXP.End
+
+Program.Sub.chkPrintBCWODetail_Click.Start
+F.Intrinsic.Control.SetErrorHandler("chkPrintBCWODetail_Click_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+v.Local.bExists.Declare
+
+f.Intrinsic.Control.If(v.Screen.FNestExport!chkPrintBCWODetail.checkedasboolean)
+	f.Intrinsic.File.String2File(v.Global.sBarCodePath,"YAY")
+f.Intrinsic.Control.Else
+	f.Intrinsic.File.Exists(v.Global.sBarCodePath,v.Local.bExists)
+	f.Intrinsic.Control.If(v.Local.bExists)
+		f.Intrinsic.File.DeleteFile(v.Global.sBarCodePath)
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("chkPrintBCWODetail_Click_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_SIGMANEST_EXPORT.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FNestExport_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.chkPrintBCWODetail_Click.End
+
+Program.Sub.PrintBarCodeWODet.Start
+F.Intrinsic.Control.SetErrorHandler("PrintBarCodeWODet_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+v.Local.sJob.Declare
+v.Local.sSuffix.Declare
+v.Local.sParms.Declare
+v.Local.icount.Declare
+V.Local.sRet.Declare(String)
+
+f.Intrinsic.control.For(v.Local.icount,0,v.DataTable.WOSOINV.RowCount--,1)
+	v.Local.sJob.Set(v.DataTable.WOSOINV(v.Local.iCount).Job!FieldValTrim)
+	v.Local.sSuffix.Set(v.DataTable.WOSOINV(v.Local.iCount).Suffix!FieldValTrim)
+	f.Intrinsic.string.Build("{0}!*!{1}!*!1811",v.Local.sJob,v.Local.sSuffix,v.local.sParms)
+	f.Global.General.CallWrapperSync(900100,v.Local.sParms)
+	F.Intrinsic.UI.Sleep(1)
+f.Intrinsic.Control.Next(v.Local.icount)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("PrintBarCodeWODet_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_SIGMANEST_EXPORT.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FNestExport_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.PrintBarCodeWODet.End
+
+Program.Sub.GetFilter.Start
+'pass DATATABLE, FIELD (*!* delimiter)
+'returns filter
+'returns a list of the distinct values of that field delimited by ','
+F.Intrinsic.Control.SetErrorHandler("GetFilter_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+
+V.Local.iCounter.Declare(Long, 0)
+V.Local.sFilter.Declare(String)
+V.Local.sDataView.Declare(String, "dvGetFilterTemp_0")
+V.Local.sDataViewFilter.Declare(String)
+
+'make sure no duplicate dataview
+F.Intrinsic.Control.DoUntil(V.DataView.[V.Args.DataTable]![V.Local.sDataView].Exists, =, False)
+	F.Intrinsic.String.Build("dvGetFilterTemp_{0}", V.Local.iCounter.++, V.Local.sDataView)
+F.Intrinsic.Control.Loop
+
+'create in filter
+F.Intrinsic.String.Build("Convert([{0}], 'System.String') <> ''", V.Args.Field, V.Local.sDataViewFilter)
+F.Data.DataView.Create(V.Args.DataTable, V.Local.sDataView, 22, V.Local.sDataViewFilter, "")
+F.Data.DataView.ToString(V.Args.DataTable, V.Local.sDataView, V.Args.Field, "***NODELIMITER***", "','", V.Local.sFilter)
+F.Data.DataView.Close(V.Args.DataTable, V.Local.sDataView)
+
+'remove duplicates
+F.Intrinsic.String.Split(V.Local.sFilter, "','", V.Local.sFilter)
+F.Intrinsic.String.RemoveArrayDuplicates(V.Local.sFilter, V.Local.sFilter)
+F.Intrinsic.String.Join(V.Local.sFilter, "','", V.Local.sFilter)
+V.Local.sFilter.RedimPreserve(0,0)
+
+F.Intrinsic.Variable.AddRV("FILTER", V.Local.sFilter)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("GetFilter_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_SIGMANEST_EXPORT.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FNestExport_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.GetFilter.End
+
+Program.Sub.GsGCJobs_RowCellClick.Start
+F.Intrinsic.Control.SetErrorHandler("GsGCJobs_RowCellClick_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+v.Local.sJob.Declare(String,"")
+v.Local.sSuf.Declare(String,"")
+v.Local.sPart.Declare(String,"")
+v.Local.sLoc.Declare(String,"")
+V.Local.sParams.Declare(String,"")
+V.Local.sID.Declare(String,"")
+V.Local.iID.Declare(Long,0)
+V.Local.sBom.Declare(String,"")
+
+F.Intrinsic.Control.BlockEvents
+
+F.Intrinsic.Control.SelectCase(v.Args.Column.UCase)
+
+	F.Intrinsic.Control.CaseAny("JOB","SUFFIX")
+		GUI.FNestExport.GsGCJobs.GetCellValueByColumnName("JobsGrid","JOB",V.Args.RowIndex,V.Local.sJob)
+		GUI.FNestExport.GsGCJobs.GetCellValueByColumnName("JobsGrid","SUFFIX",V.Args.RowIndex,V.Local.sSuf)
+
+		F.Intrinsic.String.Concat("7","!*!",V.Local.sJob,"!*!",V.Local.sSuf,"!*!","A",V.Local.sParams)
+		F.Global.General.CallWrapperSync(450000,V.Local.sParams)
+
+	F.Intrinsic.Control.CaseAny("FGPART", "RAW_MAT", "ITEMNAME")
+		GUI.FNestExport.GsGCJobs.GetCellValueByColumnName("JobsGrid", V.Args.Column,V.Args.RowIndex,V.Local.sPart)
+		GUI.FNestExport.GsGCJobs.GetCellValueByColumnName("JobsGrid", "LOCATION", V.Args.RowIndex, V.Local.sLoc)
+		
+		f.Intrinsic.Control.If(v.Global.bViewPart)
+			F.Intrinsic.String.Build("{0}!*!{1}!*!O",V.Local.sPart,V.Local.sLoc,V.Local.sParams)
+			F.Global.General.CallWrapperSync(300011,V.Local.sParams)
+		f.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.Case("DOCUMENT_CONTROL")
+		'launching document control
+		GUI.FNestExport.GsGCJobs.GetCellValueByColumnName("JobsGrid", "FGPART",V.Args.RowIndex,V.Local.sPart)
+		GUI.FNestExport.GsGCJobs.GetCellValueByColumnName("JobsGrid", "LOCATION", V.Args.RowIndex, V.Local.sLoc)
+		
+		F.Intrinsic.String.RPad(V.Local.sPart, " ", 20, V.Local.sPart)
+		F.Intrinsic.String.Build("{0}{1}", V.Local.sPart, V.Local.sLoc, V.Local.sID)
+		
+		F.Global.DocumentControl.GetLinkID(V.Local.sID,30,V.Local.iID)
+		F.Intrinsic.Control.If(V.Local.iID,=,-1)
+			F.Global.DocumentControl.CreateReference(V.Local.sID,30,V.Local.iID)
+		F.Intrinsic.Control.EndIf
+		F.Global.DocumentControl.Invoke(V.Local.sID,30,"Inventory Master",V.Local.iID)
+	
+	F.Intrinsic.Control.Case("SELECTED")
+		GUI.FNestExport.GsGCJobs.GetCellValueByColumnName("JobsGrid", "HAS_BOM_FILE", V.Args.RowIndex, V.Local.sBom)
+		
+		F.Intrinsic.Control.If(V.Local.sBom,=,"Y")
+			F.Data.DataTable.SetValue("JobData",V.Args.RowIndex,"Selected",V.DataTable.JobData(V.Args.RowIndex).Selected!FieldValNot)
+		F.Intrinsic.Control.EndIf
+		
+F.Intrinsic.Control.EndSelect
+
+F.Intrinsic.Control.UnBlockEvents
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("GsGCJobs_RowCellClick_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_SIGMANEST_EXPORT.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FNestExport_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.GsGCJobs_RowCellClick.End
+
+Program.Sub.CheckPermissions.Start
+F.Intrinsic.Control.SetErrorHandler("CheckPermissions_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String,"")
+v.Local.bChecked.Declare(boolean,false)
+	
+'Check User Permissions: View
+F.Global.Security.CheckUserAccessIPM(536, 0, V.Global.bViewWO)'Shop Floor Control > View > Work Orders
+F.Global.Security.CheckUserAccessIPM(321, 0, V.Global.bViewPart)'Inventory > View > Supply and Demand
+
+'Check User Permissions: Edit
+F.Global.Security.CheckUserAccessIPM(527, 1, V.Global.bEditWO)'Shop Floor Control > File > Work Orders > Open
+F.Global.Security.CheckUserAccessIPM(371, 0, V.Global.bEditPart)'Inventory > View > Supply and Demand with Edit
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("CheckPermissions_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	F.Intrinsic.String.Build("Project: GCG_6364_SIGMANEST_EXPORT.g2u {0}{0}Subroutine: {1}{0}Error Occurred {2} with description {3}",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.CallSub(FNestExport_UnLoad)
+Function.Intrinsic.Control.EndIf
+Program.Sub.CheckPermissions.End
+
+Program.Sub.Comments.Start
+${$5$}$2.0.0.0$}$2
+${$6$}$rking$}$20230721130141960$}$QNdZLVy4bWuiWa9jh1ZTiKHvMPldSPXexxW5PppNddY5EByYDqBYYhm1/vBPlAz/8rwOFQ+98Gg=
+Program.Sub.Comments.End
